@@ -42,6 +42,7 @@ const GlobalSearch = ({ open, onClose }: GlobalSearchProps) => {
   const studyBoard = useStudyBoard();
   const [activeIdx, setActiveIdx] = useState(-1);
   const listRef = useRef<HTMLDivElement>(null);
+  const [recentItems, setRecentItems] = useState<RecentItem[]>([]);
 
   useEffect(() => {
     if (open) {
