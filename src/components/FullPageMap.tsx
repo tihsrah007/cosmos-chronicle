@@ -510,6 +510,12 @@ const FullPageMap = ({
               item={selected}
               accentColor={getMarkerColor(selected.category)}
               onClose={() => setSelected(null)}
+              onSelectRelated={(name) => {
+                const match = pois.find(p => p.name === name);
+                if (match) {
+                  handleMarkerClick(match);
+                }
+              }}
             />
           )}
         </AnimatePresence>
