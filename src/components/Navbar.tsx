@@ -178,7 +178,7 @@ const Navbar = () => {
             animate={{ opacity: 1, y: 0 }}
             className="lg:hidden border-t border-border bg-background/95 backdrop-blur-xl"
           >
-            <div className="container flex flex-col gap-4 py-6">
+            <div className="flex flex-col gap-4 py-6 px-4">
               {navItems.map((item) => (
                 <Link
                   key={item.label}
