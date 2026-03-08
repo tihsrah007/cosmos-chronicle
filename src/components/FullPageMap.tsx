@@ -17,11 +17,13 @@ import {
   Filter,
   MapPin,
   Clock,
+  Layers,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import TimelineSlider from "./TimelineSlider";
 import DetailPanel from "./DetailPanel";
 import TimelinePlayer from "./TimelinePlayer";
+import MapLayersPanel from "./MapLayersPanel";
 
 const GEO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
@@ -126,6 +128,9 @@ const FullPageMap = ({
   const [hoveredPOI, setHoveredPOI] = useState<MapPOI | null>(null);
   const [showTimeline, setShowTimeline] = useState(!!timeline);
   const [currentYear, setCurrentYear] = useState(timeline?.defaultYear ?? 0);
+  const [showLayers, setShowLayers] = useState(false);
+  const [sourceOnlyMode, setSourceOnlyMode] = useState(false);
+  const [focusMode, setFocusMode] = useState(false);
 
   // Auto-focus from global search navigation
   useEffect(() => {
@@ -145,10 +150,21 @@ const FullPageMap = ({
   const filteredPOIs = pois.filter(
     (p) =>
       activeCategories.has(p.category) &&
+      (!sourceOnlyMode || (p.sources && p.sources.length > 0)) &&
       (searchQuery === "" ||
         p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.category.toLowerCase().includes(searchQuery.toLowerCase()))
   );
+
+  const poiCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const cat of categories) {
+      counts[cat] = pois.filter((p) => p.category === cat && (!sourceOnlyMode || (p.sources && p.sources.length > 0))).length;
+    }
+    return counts;
+  }, [pois, categories, sourceOnlyMode]);
+
+  const selectedCategoryForFocus = selected?.category ?? null;
 
   const handleZoomIn = useCallback(() => {
     setPosition((pos) => ({
@@ -255,6 +271,17 @@ const FullPageMap = ({
             }`}
           >
             <MapPin className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => setShowLayers(!showLayers)}
+            className={`p-2 rounded-lg border border-border transition-colors ${
+              showLayers
+                ? "bg-primary text-primary-foreground"
+                : "bg-secondary text-muted-foreground hover:text-foreground"
+            }`}
+            title="Layers & Legend"
+          >
+            <Layers className="h-4 w-4" />
           </button>
         </div>
       </header>
@@ -371,6 +398,8 @@ const FullPageMap = ({
 
             {filteredPOIs.map((poi) => {
               const color = getMarkerColor(poi.category);
+              const isDimmed = focusMode && selectedCategoryForFocus && poi.category !== selectedCategoryForFocus;
+              const markerOpacity = isDimmed ? 0.2 : 1;
               return (
                 <Marker
                   key={poi.name}
@@ -379,7 +408,7 @@ const FullPageMap = ({
                   onMouseEnter={() => setHoveredPOI(poi)}
                   onMouseLeave={() => setHoveredPOI(null)}
                 >
-                  <g style={{ cursor: "pointer" }} transform="translate(-10, -10)">
+                  <g style={{ cursor: "pointer", opacity: markerOpacity, transition: "opacity 0.3s" }} transform="translate(-10, -10)">
                     {/* Invisible larger hit area */}
                     <circle
                       r={16}
@@ -522,6 +551,26 @@ const FullPageMap = ({
             Zoom: {position.zoom.toFixed(1)}x
           </span>
         </div>
+
+        {/* Layers Panel */}
+        <AnimatePresence>
+          {showLayers && !selected && (
+            <MapLayersPanel
+              categories={categories}
+              activeCategories={activeCategories}
+              onToggleCategory={toggleCategory}
+              categoryColors={categoryColors}
+              fallbackColor={markerColor}
+              poiCounts={poiCounts}
+              sourceOnlyMode={sourceOnlyMode}
+              onToggleSourceOnly={() => setSourceOnlyMode((v) => !v)}
+              focusMode={focusMode}
+              onToggleFocusMode={() => setFocusMode((v) => !v)}
+              selectedCategory={selectedCategoryForFocus}
+              onClose={() => setShowLayers(false)}
+            />
+          )}
+        </AnimatePresence>
 
         {/* Info Panel */}
         <AnimatePresence>
