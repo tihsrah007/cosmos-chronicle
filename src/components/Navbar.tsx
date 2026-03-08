@@ -139,7 +139,7 @@ const Navbar = () => {
           </div>
 
           {/* Mobile toggle */}
-          <div className="flex items-center gap-2 md:hidden">
+          <div className="flex items-center gap-2 lg:hidden">
             <button onClick={() => setHelpOpen(true)} className="p-2 text-muted-foreground hover:text-foreground" aria-label="Help & Shortcuts">
               <HelpCircle className="h-5 w-5" />
             </button>
