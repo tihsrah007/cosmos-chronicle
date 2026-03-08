@@ -55,6 +55,7 @@ const GeopoliticsMap = () => {
 
   return (
     <FullPageMap
+      domainSlug="geopolitics"
       title="Geopolitical Atlas"
       subtitle="Explore chokepoints, conflict zones, alliances, and power dynamics across the globe"
       pois={pois}
