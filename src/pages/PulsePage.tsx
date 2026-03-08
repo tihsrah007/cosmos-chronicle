@@ -20,6 +20,8 @@ import Navbar from "@/components/Navbar";
 import { usePulse, getLastVisit, markVisit } from "@/hooks/use-pulse";
 import { useStudyBoard } from "@/stores/study-board";
 import type { PulseDomain, PulseSourceType, PulseUpdate } from "@/api/pulse-types";
+import AddToTrailButton from "@/components/AddToTrailButton";
+import { SourceConfidenceBadge, CopyCitationButton, inferSourceType } from "@/components/SourceBadge";
 
 /* ── helpers ── */
 
