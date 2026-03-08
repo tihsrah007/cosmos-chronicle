@@ -48,6 +48,7 @@ const GlobalSearch = ({ open, onClose }: GlobalSearchProps) => {
     if (open) {
       setQuery("");
       setActiveIdx(-1);
+      setRecentItems(loadRecent());
       setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [open]);
