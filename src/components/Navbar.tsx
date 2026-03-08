@@ -57,7 +57,7 @@ const Navbar = () => {
         transition={{ duration: 0.6 }}
         className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl overflow-x-hidden"
       >
-        <div className="container flex h-16 items-center justify-between">
+        <div className="mx-auto flex h-16 items-center justify-between px-4 max-w-screen-2xl w-full">
           <Link to="/" className="flex items-center gap-2 font-display text-xl font-bold text-foreground">
             <Compass className="h-6 w-6 text-primary" />
             <span>Terranova</span>
