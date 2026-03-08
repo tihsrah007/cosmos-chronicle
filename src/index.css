@@ -104,7 +104,7 @@
 
 /* Print styles for Study Sheet export */
 @media print {
-  nav, .print\\:hidden, [class*="print:hidden"] {
+  nav, [class*="print\:hidden"] {
     display: none !important;
   }
   body {
@@ -113,7 +113,7 @@
     font-size: 11pt;
   }
   .bg-background { background: white !important; }
-  .bg-card, .bg-secondary, .bg-secondary\\/40 { background: #f8f8f8 !important; }
+  .bg-card, .bg-secondary { background: #f8f8f8 !important; }
   .text-foreground { color: black !important; }
   .text-muted-foreground { color: #444 !important; }
   .text-primary { color: #b8860b !important; }
