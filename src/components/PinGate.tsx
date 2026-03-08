@@ -10,7 +10,7 @@ interface PinGateProps {
 const PIN_STORAGE_KEY = "terranova_pin_valid";
 
 const PinGate = ({ children }: PinGateProps) => {
-  const { data: config, isLoading: configLoading } = useAccessConfig();
+  const { data: config, isLoading: configLoading, isError } = useAccessConfig();
   const [pin, setPin] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
