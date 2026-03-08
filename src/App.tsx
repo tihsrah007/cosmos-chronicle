@@ -20,6 +20,7 @@ const TopicHubPage = lazy(() => import("./pages/TopicHubPage"));
 const TopicsIndexPage = lazy(() => import("./pages/TopicsIndexPage"));
 const ComparePage = lazy(() => import("./pages/ComparePage"));
 const NotesPage = lazy(() => import("./pages/NotesPage"));
+const TrailsPage = lazy(() => import("./pages/TrailsPage"));
 
 const queryClient = new QueryClient();
 
@@ -49,6 +50,7 @@ const App = () => (
             <Route path="/topics/:slug" element={<Suspense fallback={<LazyFallback />}><TopicHubPage /></Suspense>} />
             <Route path="/compare" element={<Suspense fallback={<LazyFallback />}><ComparePage /></Suspense>} />
             <Route path="/notes" element={<Suspense fallback={<LazyFallback />}><NotesPage /></Suspense>} />
+            <Route path="/trails" element={<Suspense fallback={<LazyFallback />}><TrailsPage /></Suspense>} />
             <Route path="/universe" element={<Suspense fallback={<LazyFallback />}><UniverseMap /></Suspense>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

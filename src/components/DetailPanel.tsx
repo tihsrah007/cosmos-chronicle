@@ -6,6 +6,9 @@ import type { MapPOI } from "./FullPageMap";
 import { useWikipediaSnapshot } from "@/hooks/use-wikipedia";
 import { useStudyBoard, makeStudyBoardId } from "@/stores/study-board";
 import NotesSection from "./NotesSection";
+import AddToTrailButton from "./AddToTrailButton";
+import GlossaryTooltip from "./GlossaryTooltip";
+import { SourceConfidenceBadge, CopyCitationButton, inferSourceType } from "./SourceBadge";
 
 interface DetailPanelProps {
   item: MapPOI;
@@ -31,7 +34,6 @@ const DetailPanel = ({ item, accentColor, domainSlug, onClose, onSelectRelated }
   }, [onSelectRelated]);
 
   const handleCompare = () => {
-    // Ensure item is on board first
     if (!isOnBoard) {
       addItem({
         name: item.name,
@@ -61,6 +63,7 @@ const DetailPanel = ({ item, accentColor, domainSlug, onClose, onSelectRelated }
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
+          aria-label="Close panel"
         >
           <X className="h-4 w-4" />
         </button>
@@ -105,15 +108,24 @@ const DetailPanel = ({ item, accentColor, domainSlug, onClose, onSelectRelated }
           >
             <ArrowLeftRight className="h-3 w-3" /> Compare
           </button>
+          <AddToTrailButton
+            compact
+            step={{
+              type: "map-item",
+              label: item.name,
+              ref: itemId,
+              domain: domainSlug,
+            }}
+          />
         </div>
       </div>
 
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto px-5 pb-5">
-        {/* Summary */}
-        <p className="font-body text-sm text-muted-foreground leading-relaxed mb-4 mt-3">
-          {item.description}
-        </p>
+        {/* Summary with glossary highlights */}
+        <div className="font-body text-sm text-muted-foreground leading-relaxed mb-4 mt-3">
+          <GlossaryTooltip text={item.description} />
+        </div>
 
         {/* Key Figures / Stats */}
         {item.keyFigures && item.keyFigures.length > 0 && (
@@ -170,9 +182,9 @@ const DetailPanel = ({ item, accentColor, domainSlug, onClose, onSelectRelated }
               animate={{ height: expandedDetails ? "auto" : 0, opacity: expandedDetails ? 1 : 0 }}
               className="overflow-hidden"
             >
-              <p className="font-body text-xs text-muted-foreground leading-relaxed">
-                {item.details}
-              </p>
+              <div className="font-body text-xs text-muted-foreground leading-relaxed">
+                <GlossaryTooltip text={item.details} />
+              </div>
             </motion.div>
           </div>
         )}
@@ -247,28 +259,33 @@ const DetailPanel = ({ item, accentColor, domainSlug, onClose, onSelectRelated }
           </div>
         )}
 
-        {/* Sources / Attribution */}
+        {/* Sources / Attribution with badges + copy citation */}
         {item.sources && item.sources.length > 0 && (
           <div className="border-t border-border pt-3">
             <span className="font-body text-[10px] text-muted-foreground/60 uppercase tracking-wider">Sources</span>
-            <div className="mt-1.5 space-y-1">
-              {item.sources.map((src, i) => (
-                <div key={i} className="flex items-center gap-1.5">
-                  {src.url ? (
-                    <a
-                      href={src.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-body text-[11px] text-primary hover:underline flex items-center gap-1"
-                    >
-                      {src.label}
-                      <ExternalLink className="h-2.5 w-2.5" />
-                    </a>
-                  ) : (
-                    <span className="font-body text-[11px] text-muted-foreground">{src.label}</span>
-                  )}
-                </div>
-              ))}
+            <div className="mt-1.5 space-y-1.5">
+              {item.sources.map((src, i) => {
+                const srcType = inferSourceType(src.label, src.url);
+                return (
+                  <div key={i} className="flex items-center gap-1.5">
+                    <SourceConfidenceBadge type={srcType} />
+                    {src.url ? (
+                      <a
+                        href={src.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-body text-[11px] text-primary hover:underline flex items-center gap-1"
+                      >
+                        {src.label}
+                        <ExternalLink className="h-2.5 w-2.5" />
+                      </a>
+                    ) : (
+                      <span className="font-body text-[11px] text-muted-foreground">{src.label}</span>
+                    )}
+                    <CopyCitationButton label={src.label} url={src.url} />
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
