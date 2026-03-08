@@ -1,11 +1,27 @@
-import { Landmark, Globe, Mountain, Telescope } from "lucide-react";
+import { Landmark, Globe, Mountain, Telescope, LucideIcon } from "lucide-react";
 import DomainCard from "./DomainCard";
+import { useDomains } from "@/hooks/use-domains";
+// Static fallbacks
 import historyImg from "@/assets/history-card.jpg";
 import geopoliticsImg from "@/assets/geopolitics-card.jpg";
 import geologyImg from "@/assets/geology-card.jpg";
 import cosmologyImg from "@/assets/cosmology-card.jpg";
 
-const domains = [
+const iconMap: Record<string, LucideIcon> = {
+  landmark: Landmark,
+  globe: Globe,
+  mountain: Mountain,
+  telescope: Telescope,
+};
+
+const imageMap: Record<string, string> = {
+  history: historyImg,
+  geopolitics: geopoliticsImg,
+  geology: geologyImg,
+  cosmology: cosmologyImg,
+};
+
+const staticDomains = [
   {
     title: "History",
     description: "Civilizations rise and fall. Trace the threads of empires, revolutions, and the ideas that remade the world.",
@@ -53,6 +69,18 @@ const domains = [
 ];
 
 const DomainsSection = () => {
+  const { data: apiDomains } = useDomains();
+
+  const domains = apiDomains
+    ? apiDomains.map((d) => ({
+        title: d.title,
+        description: d.description,
+        image: d.image || imageMap[d.slug] || historyImg,
+        icon: iconMap[d.icon] || Landmark,
+        facts: d.facts,
+      }))
+    : staticDomains;
+
   return (
     <section id="domains" className="relative py-24">
       <div className="container px-4">
