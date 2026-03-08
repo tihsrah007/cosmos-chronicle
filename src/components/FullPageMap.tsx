@@ -95,6 +95,8 @@ const FullPageMap = ({
   accentGradient,
   countryDescriptions,
   backLabel = "Back to Home",
+  timeline,
+  timelineOverlay,
 }: FullPageMapProps) => {
   const navigate = useNavigate();
   const [selected, setSelected] = useState<MapPOI | null>(null);
