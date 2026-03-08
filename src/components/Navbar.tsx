@@ -1,8 +1,15 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Compass, Menu, X, Search, StickyNote, Route, BookOpen, HelpCircle } from "lucide-react";
+import { Compass, Menu, X, Search, StickyNote, Route, BookOpen, HelpCircle, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import GlobalSearch from "./GlobalSearch";
 import GlossaryDrawer from "./GlossaryDrawer";
 import HelpSheet from "./HelpSheet";
@@ -10,17 +17,22 @@ import FirstRunTip from "./FirstRunTip";
 import { useNotes } from "@/stores/notes";
 import { useTrails } from "@/stores/trails";
 
-const navItems = [
+const primaryNav = [
   { label: "History", href: "/history" },
   { label: "Geopolitics", href: "/geopolitics" },
   { label: "Geology", href: "/geology" },
   { label: "Cosmology", href: "/cosmology" },
   { label: "Universe", href: "/universe" },
   { label: "Explore", href: "/explore" },
+];
+
+const moreNav = [
   { label: "Topics", href: "/topics" },
   { label: "Study Board", href: "/study-board" },
   { label: "Pulse", href: "/pulse" },
 ];
+
+const allMobileNav = [...primaryNav, ...moreNav];
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -32,7 +44,6 @@ const Navbar = () => {
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      // Don't fire when typing in inputs/textareas
       const tag = (e.target as HTMLElement)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || (e.target as HTMLElement)?.isContentEditable) return;
 
@@ -58,110 +69,86 @@ const Navbar = () => {
         className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl overflow-x-hidden"
       >
         <div className="mx-auto flex h-16 items-center justify-between px-4 max-w-screen-2xl w-full">
-          <Link to="/" className="flex items-center gap-2 font-display text-xl font-bold text-foreground">
+          <Link to="/" className="flex items-center gap-2 font-display text-xl font-bold text-foreground shrink-0">
             <Compass className="h-6 w-6 text-primary" />
             <span>Terranova</span>
           </Link>
 
           {/* Desktop */}
-          <div className="hidden lg:flex items-center gap-3 flex-wrap">
-            {navItems.map((item) => (
+          <div className="hidden lg:flex items-center gap-3">
+            {primaryNav.map((item) => (
               <Link
                 key={item.label}
                 to={item.href}
-                className="font-body text-sm tracking-wide text-muted-foreground transition-colors hover:text-primary"
+                className="font-body text-sm tracking-wide text-muted-foreground transition-colors hover:text-primary whitespace-nowrap"
               >
                 {item.label}
               </Link>
             ))}
-            {/* Trails */}
-            <Link
-              to="/trails"
-              className="relative font-body text-sm tracking-wide text-muted-foreground transition-colors hover:text-primary flex items-center gap-1"
-              aria-label={`Trails (${trails.length})`}
-            >
-              <Route className="h-3.5 w-3.5" />
-              <span>Trails</span>
-              {trails.length > 0 && (
-                <span className="absolute -top-1.5 -right-2.5 min-w-[16px] h-4 flex items-center justify-center px-1 rounded-full bg-primary text-primary-foreground font-body text-[9px] font-bold">
-                  {trails.length}
-                </span>
-              )}
-            </Link>
-            {/* Notes with badge */}
-            <Link
-              to="/notes"
-              className="relative font-body text-sm tracking-wide text-muted-foreground transition-colors hover:text-primary flex items-center gap-1"
-              aria-label={`Notes (${notes.length})`}
-            >
-              <StickyNote className="h-3.5 w-3.5" />
-              <span>Notes</span>
-              {notes.length > 0 && (
-                <span className="absolute -top-1.5 -right-2.5 min-w-[16px] h-4 flex items-center justify-center px-1 rounded-full bg-primary text-primary-foreground font-body text-[9px] font-bold">
-                  {notes.length}
-                </span>
-              )}
-            </Link>
-            {/* Glossary */}
-            <button
-              onClick={() => setGlossaryOpen(true)}
-              className="font-body text-sm tracking-wide text-muted-foreground transition-colors hover:text-primary flex items-center gap-1"
-              aria-label="Open glossary"
-            >
-              <BookOpen className="h-3.5 w-3.5" />
-              <span>Glossary</span>
-            </button>
-            {/* Help */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={() => setHelpOpen(true)}
-                  className="font-body text-sm tracking-wide text-muted-foreground transition-colors hover:text-primary flex items-center gap-1"
-                  aria-label="Help & Shortcuts"
-                >
-                  <HelpCircle className="h-3.5 w-3.5" />
-                  <span>Help</span>
+
+            {/* More dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="font-body text-sm tracking-wide text-muted-foreground transition-colors hover:text-primary flex items-center gap-0.5 whitespace-nowrap">
+                  More
+                  <ChevronDown className="h-3.5 w-3.5" />
                 </button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom" className="text-xs">
-                Help & Shortcuts <kbd className="ml-1 px-1 py-0.5 rounded bg-muted border border-border text-[10px] font-mono">?</kbd>
-              </TooltipContent>
-            </Tooltip>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-44">
+                {moreNav.map((item) => (
+                  <DropdownMenuItem key={item.label} asChild>
+                    <Link to={item.href} className="w-full cursor-pointer">
+                      {item.label}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/trails" className="w-full cursor-pointer flex items-center justify-between">
+                    <span className="flex items-center gap-2"><Route className="h-3.5 w-3.5" />Trails</span>
+                    {trails.length > 0 && (
+                      <span className="min-w-[16px] h-4 flex items-center justify-center px-1 rounded-full bg-primary text-primary-foreground text-[9px] font-bold">
+                        {trails.length}
+                      </span>
+                    )}
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/notes" className="w-full cursor-pointer flex items-center justify-between">
+                    <span className="flex items-center gap-2"><StickyNote className="h-3.5 w-3.5" />Notes</span>
+                    {notes.length > 0 && (
+                      <span className="min-w-[16px] h-4 flex items-center justify-center px-1 rounded-full bg-primary text-primary-foreground text-[9px] font-bold">
+                        {notes.length}
+                      </span>
+                    )}
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setGlossaryOpen(true)} className="cursor-pointer">
+                  <BookOpen className="h-3.5 w-3.5 mr-2" />
+                  Glossary
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setHelpOpen(true)} className="cursor-pointer">
+                  <HelpCircle className="h-3.5 w-3.5 mr-2" />
+                  Help
+                  <kbd className="ml-auto px-1 py-0.5 rounded bg-muted border border-border text-[9px] font-mono">?</kbd>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <button
               onClick={() => setSearchOpen(true)}
-              className="flex items-center gap-2 rounded-lg bg-secondary border border-border px-3 py-1.5 font-body text-sm text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all"
+              className="flex items-center gap-2 rounded-lg bg-secondary border border-border px-3 py-1.5 font-body text-sm text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all whitespace-nowrap"
               aria-label="Search (Cmd+K)"
             >
               <Search className="h-3.5 w-3.5" />
               <span>Search</span>
-              <kbd className="hidden lg:inline px-1.5 py-0.5 rounded bg-background text-[10px] text-muted-foreground/60">⌘K</kbd>
+              <kbd className="hidden xl:inline px-1.5 py-0.5 rounded bg-background text-[10px] text-muted-foreground/60">⌘K</kbd>
             </button>
           </div>
 
           {/* Mobile toggle */}
           <div className="flex items-center gap-2 lg:hidden">
-            <button onClick={() => setHelpOpen(true)} className="p-2 text-muted-foreground hover:text-foreground" aria-label="Help & Shortcuts">
-              <HelpCircle className="h-5 w-5" />
-            </button>
-            <button onClick={() => setGlossaryOpen(true)} className="p-2 text-muted-foreground hover:text-foreground" aria-label="Glossary">
-              <BookOpen className="h-5 w-5" />
-            </button>
-            <Link to="/trails" className="relative p-2 text-muted-foreground hover:text-foreground" aria-label="Trails">
-              <Route className="h-5 w-5" />
-              {trails.length > 0 && (
-                <span className="absolute top-0.5 right-0.5 min-w-[14px] h-3.5 flex items-center justify-center px-0.5 rounded-full bg-primary text-primary-foreground text-[8px] font-bold">
-                  {trails.length}
-                </span>
-              )}
-            </Link>
-            <Link to="/notes" className="relative p-2 text-muted-foreground hover:text-foreground" aria-label="Notes">
-              <StickyNote className="h-5 w-5" />
-              {notes.length > 0 && (
-                <span className="absolute top-0.5 right-0.5 min-w-[14px] h-3.5 flex items-center justify-center px-0.5 rounded-full bg-primary text-primary-foreground text-[8px] font-bold">
-                  {notes.length}
-                </span>
-              )}
-            </Link>
             <button onClick={() => setSearchOpen(true)} className="p-2 text-muted-foreground hover:text-foreground" aria-label="Search">
               <Search className="h-5 w-5" />
             </button>
@@ -179,7 +166,7 @@ const Navbar = () => {
             className="lg:hidden border-t border-border bg-background/95 backdrop-blur-xl"
           >
             <div className="flex flex-col gap-4 py-6 px-4">
-              {navItems.map((item) => (
+              {allMobileNav.map((item) => (
                 <Link
                   key={item.label}
                   to={item.href}
@@ -194,7 +181,7 @@ const Navbar = () => {
                 onClick={() => setOpen(false)}
                 className="font-body text-base text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
               >
-                Trails
+                <Route className="h-4 w-4" /> Trails
                 {trails.length > 0 && (
                   <span className="px-1.5 py-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
                     {trails.length}
@@ -206,13 +193,25 @@ const Navbar = () => {
                 onClick={() => setOpen(false)}
                 className="font-body text-base text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
               >
-                Notes
+                <StickyNote className="h-4 w-4" /> Notes
                 {notes.length > 0 && (
                   <span className="px-1.5 py-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
                     {notes.length}
                   </span>
                 )}
               </Link>
+              <button
+                onClick={() => { setGlossaryOpen(true); setOpen(false); }}
+                className="font-body text-base text-muted-foreground hover:text-primary transition-colors flex items-center gap-2 text-left"
+              >
+                <BookOpen className="h-4 w-4" /> Glossary
+              </button>
+              <button
+                onClick={() => { setHelpOpen(true); setOpen(false); }}
+                className="font-body text-base text-muted-foreground hover:text-primary transition-colors flex items-center gap-2 text-left"
+              >
+                <HelpCircle className="h-4 w-4" /> Help
+              </button>
             </div>
           </motion.div>
         )}
