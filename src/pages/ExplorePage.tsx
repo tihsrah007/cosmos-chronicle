@@ -6,9 +6,6 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useDomainItems } from "@/hooks/use-domain-items";
 import { useStudyBoard, makeStudyBoardId } from "@/stores/study-board";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import { useDomainItems } from "@/hooks/use-domain-items";
 
 const DOMAINS = [
   { slug: "history", label: "History", icon: Landmark, route: "/history", color: "hsl(38, 90%, 55%)" },
