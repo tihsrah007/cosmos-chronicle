@@ -150,10 +150,21 @@ const FullPageMap = ({
   const filteredPOIs = pois.filter(
     (p) =>
       activeCategories.has(p.category) &&
+      (!sourceOnlyMode || (p.sources && p.sources.length > 0)) &&
       (searchQuery === "" ||
         p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.category.toLowerCase().includes(searchQuery.toLowerCase()))
   );
+
+  const poiCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const cat of categories) {
+      counts[cat] = pois.filter((p) => p.category === cat && (!sourceOnlyMode || (p.sources && p.sources.length > 0))).length;
+    }
+    return counts;
+  }, [pois, categories, sourceOnlyMode]);
+
+  const selectedCategoryForFocus = selected?.category ?? null;
 
   const handleZoomIn = useCallback(() => {
     setPosition((pos) => ({
