@@ -428,15 +428,19 @@ const PulsePage = () => {
                         {/* Actions */}
                         <div className="flex items-center gap-3 flex-wrap">
                           {u.sourceUrl && (
-                            <a
-                              href={u.sourceUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center gap-1.5 font-body text-xs text-primary hover:underline"
-                            >
-                              <ExternalLink className="h-3 w-3" />
-                              Read Source
-                            </a>
+                            <span className="flex items-center gap-1.5">
+                              <SourceConfidenceBadge type={inferSourceType(u.sourceName, u.sourceUrl)} />
+                              <a
+                                href={u.sourceUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="font-body text-xs text-primary hover:underline inline-flex items-center gap-1"
+                              >
+                                <ExternalLink className="h-3 w-3" />
+                                Read Source
+                              </a>
+                              <CopyCitationButton label={u.sourceName} url={u.sourceUrl} />
+                            </span>
                           )}
                           {u.mapDomain && (
                             <button
