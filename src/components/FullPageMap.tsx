@@ -96,6 +96,7 @@ const FullPageMap = ({
   );
   const [showFilters, setShowFilters] = useState(false);
   const [showList, setShowList] = useState(false);
+  const [hoveredPOI, setHoveredPOI] = useState<MapPOI | null>(null);
 
   const filteredPOIs = pois.filter(
     (p) =>
@@ -319,6 +320,8 @@ const FullPageMap = ({
                   key={poi.name}
                   coordinates={poi.coordinates}
                   onClick={() => handleMarkerClick(poi)}
+                  onMouseEnter={() => setHoveredPOI(poi)}
+                  onMouseLeave={() => setHoveredPOI(null)}
                 >
                   <g style={{ cursor: "pointer" }} transform="translate(-6, -6)">
                     <circle
@@ -359,9 +362,43 @@ const FullPageMap = ({
           </ZoomableGroup>
         </ComposableMap>
 
+        {/* POI Hover Tooltip */}
+        <AnimatePresence>
+          {hoveredPOI && !selected && (
+            <motion.div
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="fixed bottom-20 left-1/2 -translate-x-1/2 z-30 max-w-xs w-full px-4 py-3 rounded-lg bg-card/95 backdrop-blur-xl border border-border shadow-lg pointer-events-none"
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <span
+                  className="w-2 h-2 rounded-full flex-shrink-0"
+                  style={{ backgroundColor: getMarkerColor(hoveredPOI.category) }}
+                />
+                <p className="font-display text-sm font-semibold text-foreground truncate">
+                  {hoveredPOI.name}
+                </p>
+              </div>
+              <p className="font-body text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                {hoveredPOI.description}
+              </p>
+              <span
+                className="inline-block mt-1.5 px-2 py-0.5 rounded text-[10px] font-body font-medium"
+                style={{
+                  backgroundColor: `${getMarkerColor(hoveredPOI.category)}20`,
+                  color: getMarkerColor(hoveredPOI.category),
+                }}
+              >
+                {hoveredPOI.category}
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Country Tooltip */}
         <AnimatePresence>
-          {hoveredCountry && !selected && (
+          {hoveredCountry && !selected && !hoveredPOI && (
             <motion.div
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
