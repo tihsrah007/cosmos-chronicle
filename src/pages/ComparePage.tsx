@@ -33,18 +33,11 @@ const domainRoutes: Record<string, string> = {
 };
 
 function loadPersistedCompare(): { itemA?: string; itemB?: string } {
-  try {
-    const raw = sessionStorage.getItem(COMPARE_KEY);
-    return raw ? JSON.parse(raw) : {};
-  } catch {
-    return {};
-  }
+  return loadCompare();
 }
 
 function persistCompare(state: { itemA?: string; itemB?: string }) {
-  try {
-    sessionStorage.setItem(COMPARE_KEY, JSON.stringify(state));
-  } catch {}
+  saveCompare(state);
 }
 
 const ComparePage = () => {
