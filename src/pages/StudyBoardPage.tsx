@@ -13,11 +13,15 @@ import {
   ExternalLink,
   BarChart3,
   X,
+  ArrowLeftRight,
+  Zap,
 } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useStudyBoard, type StudyBoardItem } from "@/stores/study-board";
+import { usePulse } from "@/hooks/use-pulse";
+import NotesSection from "@/components/NotesSection";
 
 const domainMeta: Record<string, { icon: typeof Globe; color: string; route: string; label: string }> = {
   history: { icon: Landmark, color: "hsl(38, 90%, 55%)", route: "/history", label: "History" },
@@ -30,6 +34,16 @@ const StudyBoardPage = () => {
   const { items, removeItem, moveItem, clear } = useStudyBoard();
   const navigate = useNavigate();
   const [confirmClear, setConfirmClear] = useState(false);
+  const [compareSelection, setCompareSelection] = useState<string[]>([]);
+  const { data: pulseUpdates } = usePulse();
+
+  const newThisWeek = useMemo(() => {
+    if (!pulseUpdates) return [];
+    const weekAgo = Date.now() - 7 * 86400_000;
+    return pulseUpdates
+      .filter((u) => new Date(u.publishedAt).getTime() > weekAgo)
+      .slice(0, 4);
+  }, [pulseUpdates]);
 
   const grouped = useMemo(() => {
     const groups: Record<string, StudyBoardItem[]> = {};
@@ -47,6 +61,22 @@ const StudyBoardPage = () => {
     navigate(meta.route, {
       state: { focusItem: item.name, focusCoordinates: item.coordinates },
     });
+  };
+
+  const toggleCompare = (id: string) => {
+    setCompareSelection((prev) => {
+      if (prev.includes(id)) return prev.filter((x) => x !== id);
+      if (prev.length >= 2) return [prev[1], id];
+      return [...prev, id];
+    });
+  };
+
+  const launchCompare = () => {
+    if (compareSelection.length === 2) {
+      navigate("/compare", {
+        state: { itemA: compareSelection[0], itemB: compareSelection[1] },
+      });
+    }
   };
 
   return (
@@ -72,37 +102,78 @@ const StudyBoardPage = () => {
                 Your personal collection of atlas items. Saved on this device only — add items from any map or the explore page.
               </p>
             </div>
-            {items.length > 0 && (
-              <div className="shrink-0 pt-2">
-                {confirmClear ? (
-                  <div className="flex items-center gap-2">
-                    <span className="font-body text-xs text-muted-foreground">Clear all?</span>
+            <div className="shrink-0 pt-2 flex items-center gap-2">
+              {compareSelection.length === 2 && (
+                <button
+                  onClick={launchCompare}
+                  className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground font-body text-xs font-medium flex items-center gap-1.5"
+                >
+                  <ArrowLeftRight className="h-3.5 w-3.5" /> Compare ({compareSelection.length})
+                </button>
+              )}
+              {items.length > 0 && (
+                <>
+                  {confirmClear ? (
+                    <div className="flex items-center gap-2">
+                      <span className="font-body text-xs text-muted-foreground">Clear all?</span>
+                      <button
+                        onClick={() => { clear(); setConfirmClear(false); }}
+                        className="px-3 py-1.5 rounded-lg bg-destructive text-destructive-foreground font-body text-xs font-medium"
+                      >
+                        Yes
+                      </button>
+                      <button
+                        onClick={() => setConfirmClear(false)}
+                        className="px-3 py-1.5 rounded-lg bg-secondary border border-border font-body text-xs text-muted-foreground"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
                     <button
-                      onClick={() => { clear(); setConfirmClear(false); }}
-                      className="px-3 py-1.5 rounded-lg bg-destructive text-destructive-foreground font-body text-xs font-medium"
+                      onClick={() => setConfirmClear(true)}
+                      className="px-3 py-1.5 rounded-lg bg-secondary border border-border font-body text-xs text-muted-foreground hover:text-foreground transition-colors"
                     >
-                      Yes
+                      Clear All
                     </button>
-                    <button
-                      onClick={() => setConfirmClear(false)}
-                      className="px-3 py-1.5 rounded-lg bg-secondary border border-border font-body text-xs text-muted-foreground"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => setConfirmClear(true)}
-                    className="px-3 py-1.5 rounded-lg bg-secondary border border-border font-body text-xs text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    Clear All
-                  </button>
-                )}
-              </div>
-            )}
+                  )}
+                </>
+              )}
+            </div>
           </motion.div>
         </div>
       </section>
+
+      {/* New This Week Widget */}
+      {newThisWeek.length > 0 && (
+        <section className="container max-w-5xl mx-auto px-4 mb-6">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-xl border border-primary/20 bg-primary/5 p-4"
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <Zap className="h-4 w-4 text-primary" />
+              <span className="font-body text-sm font-semibold text-foreground">New This Week from Pulse</span>
+              <Link to="/pulse" className="ml-auto font-body text-xs text-primary hover:underline">
+                View all →
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {newThisWeek.map((u) => (
+                <Link
+                  key={u.id}
+                  to="/pulse"
+                  className="rounded-lg bg-card border border-border p-3 hover:border-primary/30 transition-colors"
+                >
+                  <h4 className="font-display text-xs font-bold text-foreground mb-1 line-clamp-1">{u.title}</h4>
+                  <p className="font-body text-[10px] text-muted-foreground line-clamp-1">{u.summary}</p>
+                </Link>
+              ))}
+            </div>
+          </motion.div>
+        </section>
+      )}
 
       {/* Content */}
       <section className="container max-w-5xl mx-auto px-4 pb-16">
@@ -136,6 +207,11 @@ const StudyBoardPage = () => {
           </motion.div>
         ) : (
           <div className="space-y-8">
+            {compareSelection.length < 2 && items.length >= 2 && (
+              <p className="font-body text-xs text-muted-foreground">
+                💡 Click the compare icon on any two cards to compare them side-by-side.
+              </p>
+            )}
             <AnimatePresence mode="popLayout">
               {Object.entries(grouped).map(([domain, domainItems]) => {
                 const meta = domainMeta[domain];
@@ -162,6 +238,7 @@ const StudyBoardPage = () => {
                       <AnimatePresence mode="popLayout">
                         {domainItems.map((item) => {
                           const idx = globalIndex(item);
+                          const isCompareSelected = compareSelection.includes(item.id);
                           return (
                             <motion.div
                               key={item.id}
@@ -169,7 +246,9 @@ const StudyBoardPage = () => {
                               initial={{ opacity: 0, scale: 0.97 }}
                               animate={{ opacity: 1, scale: 1 }}
                               exit={{ opacity: 0, scale: 0.95 }}
-                              className="rounded-xl border border-border bg-card overflow-hidden"
+                              className={`rounded-xl border bg-card overflow-hidden transition-colors ${
+                                isCompareSelected ? "border-primary/50 ring-1 ring-primary/20" : "border-border"
+                              }`}
                             >
                               <div className="p-5">
                                 {/* Header row */}
@@ -189,6 +268,17 @@ const StudyBoardPage = () => {
                                     </h3>
                                   </div>
                                   <div className="flex items-center gap-1 shrink-0">
+                                    <button
+                                      onClick={() => toggleCompare(item.id)}
+                                      className={`p-1 rounded transition-colors ${
+                                        isCompareSelected
+                                          ? "text-primary bg-primary/10"
+                                          : "text-muted-foreground hover:text-foreground"
+                                      }`}
+                                      title="Compare"
+                                    >
+                                      <ArrowLeftRight className="h-3.5 w-3.5" />
+                                    </button>
                                     {idx > 0 && (
                                       <button
                                         onClick={() => moveItem(idx, idx - 1)}
@@ -263,6 +353,11 @@ const StudyBoardPage = () => {
                                     </div>
                                   </div>
                                 )}
+
+                                {/* Notes */}
+                                <div className="mb-3">
+                                  <NotesSection itemId={item.id} compact />
+                                </div>
 
                                 {/* Actions */}
                                 <div className="flex items-center gap-2 pt-1">
