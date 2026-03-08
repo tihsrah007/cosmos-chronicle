@@ -56,8 +56,8 @@ const PinGate = ({ children }: PinGateProps) => {
     );
   }
 
-  // No PIN required or already granted
-  if (!config?.pinRequired || granted) {
+  // No PIN required, already granted, or config fetch failed — let them through
+  if (!config?.pinRequired || granted || isError) {
     return <>{children}</>;
   }
 
