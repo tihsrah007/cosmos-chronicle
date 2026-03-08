@@ -24,6 +24,7 @@ import TimelineSlider from "./TimelineSlider";
 import DetailPanel from "./DetailPanel";
 import TimelinePlayer from "./TimelinePlayer";
 import MapLayersPanel from "./MapLayersPanel";
+import MapTip from "./MapTip";
 
 const GEO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
@@ -207,6 +208,7 @@ const FullPageMap = ({
 
   return (
     <div className="fixed inset-0 bg-background flex flex-col overflow-hidden">
+      <MapTip domainSlug={domainSlug} hasTimeline={!!timeline} />
       {/* Top Bar */}
       <header className="relative z-30 flex items-center justify-between px-4 md:px-6 py-3 border-b border-border bg-card/80 backdrop-blur-xl">
         <div className="flex items-center gap-3">

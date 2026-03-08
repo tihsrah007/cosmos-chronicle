@@ -22,6 +22,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import TimelineSlider from "@/components/TimelineSlider";
 import TimelinePlayer from "@/components/TimelinePlayer";
 import DetailPanel from "@/components/DetailPanel";
+import MapTip from "@/components/MapTip";
 import MapLoadingState from "@/components/MapLoadingState";
 import MapErrorState from "@/components/MapErrorState";
 import { useDomainItems } from "@/hooks/use-domain-items";
@@ -179,6 +180,7 @@ const HistoryMap = () => {
 
   return (
     <div className="fixed inset-0 bg-background flex flex-col overflow-hidden">
+      <MapTip domainSlug="history" />
       {/* Top Bar */}
       <header className="relative z-30 flex items-center justify-between px-4 md:px-6 py-3 border-b border-border bg-card/80 backdrop-blur-xl">
         <div className="flex items-center gap-3">
