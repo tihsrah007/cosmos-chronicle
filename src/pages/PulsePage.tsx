@@ -445,6 +445,32 @@ const PulsePage = () => {
                               Open on Map
                             </button>
                           )}
+                          {(() => {
+                            const boardId = `${u.domain}-${u.title}`;
+                            const onBoard = hasItem(boardId);
+                            return (
+                              <button
+                                onClick={() => {
+                                  if (!onBoard) {
+                                    addItem({
+                                      name: u.title,
+                                      domain: u.domain,
+                                      category: u.sourceType,
+                                      description: u.summary,
+                                      coordinates: u.coordinates,
+                                      sources: u.sourceUrl ? [{ label: u.sourceName, url: u.sourceUrl }] : [],
+                                    });
+                                  }
+                                }}
+                                disabled={onBoard}
+                                className={`flex items-center gap-1.5 font-body text-xs transition-colors ${
+                                  onBoard ? "text-primary/60" : "text-primary hover:underline"
+                                }`}
+                              >
+                                {onBoard ? <><Check className="h-3 w-3" /> Saved</> : <><Plus className="h-3 w-3" /> Study Board</>}
+                              </button>
+                            );
+                          })()}
                         </div>
                       </div>
                     </div>
