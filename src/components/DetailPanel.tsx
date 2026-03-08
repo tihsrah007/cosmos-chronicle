@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { X, ChevronDown, ChevronUp, ExternalLink, BarChart3, BookOpen, Link2, Globe, Plus, Check, ArrowLeftRight } from "lucide-react";
+import { X, ChevronDown, ChevronUp, BarChart3, BookOpen, Link2, Globe, Plus, Check, ArrowLeftRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { MapPOI } from "./FullPageMap";
 import { useWikipediaSnapshot } from "@/hooks/use-wikipedia";
@@ -8,7 +8,9 @@ import { useStudyBoard, makeStudyBoardId } from "@/stores/study-board";
 import NotesSection from "./NotesSection";
 import AddToTrailButton from "./AddToTrailButton";
 import GlossaryTooltip from "./GlossaryTooltip";
-import { SourceConfidenceBadge, CopyCitationButton, inferSourceType } from "./SourceBadge";
+import SourceList from "./SourceList";
+import { ExternalLink } from "lucide-react";
+import { SkeletonBlock } from "./ui/shared";
 
 interface DetailPanelProps {
   item: MapPOI;
@@ -23,31 +25,29 @@ const DetailPanel = ({ item, accentColor, domainSlug, onClose, onSelectRelated }
   const [expandedDetails, setExpandedDetails] = useState(false);
   const [showWiki, setShowWiki] = useState(false);
   const { data: wiki, isLoading: wikiLoading } = useWikipediaSnapshot(item.name);
-  const { addItem, hasItem, items: boardItems } = useStudyBoard();
+  const { addItem, hasItem } = useStudyBoard();
   const itemId = makeStudyBoardId(domainSlug, item.name);
   const isOnBoard = hasItem(itemId);
 
   const handleRelatedClick = useCallback((name: string) => {
-    if (onSelectRelated) {
-      onSelectRelated(name);
-    }
+    onSelectRelated?.(name);
   }, [onSelectRelated]);
 
   const handleCompare = () => {
     if (!isOnBoard) {
       addItem({
-        name: item.name,
-        domain: domainSlug,
-        category: item.category,
-        description: item.description,
-        details: item.details,
-        facts: item.facts,
-        keyFigures: item.keyFigures,
-        sources: item.sources,
-        coordinates: item.coordinates,
+        name: item.name, domain: domainSlug, category: item.category,
+        description: item.description, details: item.details, facts: item.facts,
+        keyFigures: item.keyFigures, sources: item.sources, coordinates: item.coordinates,
       });
     }
     navigate("/compare", { state: { itemA: itemId } });
+  };
+
+  const boardPayload = {
+    name: item.name, domain: domainSlug, category: item.category,
+    description: item.description, details: item.details, facts: item.facts,
+    keyFigures: item.keyFigures, sources: item.sources, coordinates: item.coordinates,
   };
 
   return (
@@ -60,39 +60,20 @@ const DetailPanel = ({ item, accentColor, domainSlug, onClose, onSelectRelated }
     >
       {/* Header */}
       <div className="p-5 pb-0">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
-          aria-label="Close panel"
-        >
+        <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors" aria-label="Close panel">
           <X className="h-4 w-4" />
         </button>
         <span
           className="inline-block px-2.5 py-0.5 rounded-md text-xs font-body font-semibold mb-3"
-          style={{
-            backgroundColor: `${accentColor}20`,
-            color: accentColor,
-          }}
+          style={{ backgroundColor: `${accentColor}20`, color: accentColor }}
         >
           {item.category}
         </span>
-        <h3 className="font-display text-xl font-bold text-foreground mb-2 pr-6">
-          {item.name}
-        </h3>
-        {/* Actions row */}
+        <h3 className="font-display text-xl font-bold text-foreground mb-2 pr-6">{item.name}</h3>
+        {/* Actions */}
         <div className="flex items-center gap-2 flex-wrap">
           <button
-            onClick={() => addItem({
-              name: item.name,
-              domain: domainSlug,
-              category: item.category,
-              description: item.description,
-              details: item.details,
-              facts: item.facts,
-              keyFigures: item.keyFigures,
-              sources: item.sources,
-              coordinates: item.coordinates,
-            })}
+            onClick={() => addItem(boardPayload)}
             disabled={isOnBoard}
             className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md font-body text-[11px] font-medium transition-colors ${
               isOnBoard
@@ -108,26 +89,17 @@ const DetailPanel = ({ item, accentColor, domainSlug, onClose, onSelectRelated }
           >
             <ArrowLeftRight className="h-3 w-3" /> Compare
           </button>
-          <AddToTrailButton
-            compact
-            step={{
-              type: "map-item",
-              label: item.name,
-              ref: itemId,
-              domain: domainSlug,
-            }}
-          />
+          <AddToTrailButton compact step={{ type: "map-item", label: item.name, ref: itemId, domain: domainSlug }} />
         </div>
       </div>
 
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto px-5 pb-5">
-        {/* Summary with glossary highlights */}
         <div className="font-body text-sm text-muted-foreground leading-relaxed mb-4 mt-3">
           <GlossaryTooltip text={item.description} />
         </div>
 
-        {/* Key Figures / Stats */}
+        {/* Key Figures */}
         {item.keyFigures && item.keyFigures.length > 0 && (
           <div className="mb-4">
             <div className="flex items-center gap-1.5 mb-2">
@@ -145,7 +117,7 @@ const DetailPanel = ({ item, accentColor, domainSlug, onClose, onSelectRelated }
           </div>
         )}
 
-        {/* Fact Cards */}
+        {/* Facts */}
         {item.facts && item.facts.length > 0 && (
           <div className="mb-4">
             <div className="flex items-center gap-1.5 mb-2">
@@ -163,25 +135,14 @@ const DetailPanel = ({ item, accentColor, domainSlug, onClose, onSelectRelated }
           </div>
         )}
 
-        {/* Extended Details (expandable) */}
+        {/* Details */}
         {item.details && (
           <div className="mb-4 border-t border-border pt-3">
-            <button
-              onClick={() => setExpandedDetails(!expandedDetails)}
-              className="flex items-center gap-1.5 w-full text-left mb-2"
-            >
+            <button onClick={() => setExpandedDetails(!expandedDetails)} className="flex items-center gap-1.5 w-full text-left mb-2">
               <span className="font-body text-xs font-semibold text-foreground uppercase tracking-wider">Read More</span>
-              {expandedDetails ? (
-                <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" />
-              ) : (
-                <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-              )}
+              {expandedDetails ? <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" /> : <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />}
             </button>
-            <motion.div
-              initial={false}
-              animate={{ height: expandedDetails ? "auto" : 0, opacity: expandedDetails ? 1 : 0 }}
-              className="overflow-hidden"
-            >
+            <motion.div initial={false} animate={{ height: expandedDetails ? "auto" : 0, opacity: expandedDetails ? 1 : 0 }} className="overflow-hidden">
               <div className="font-body text-xs text-muted-foreground leading-relaxed">
                 <GlossaryTooltip text={item.details} />
               </div>
@@ -210,47 +171,26 @@ const DetailPanel = ({ item, accentColor, domainSlug, onClose, onSelectRelated }
           </div>
         )}
 
-        {/* Personal Notes */}
+        {/* Notes */}
         <div className="mb-4">
           <NotesSection itemId={itemId} />
         </div>
 
-        {/* Wikipedia Enrichment */}
+        {/* Wikipedia */}
         {(wiki || wikiLoading) && (
           <div className="mb-4 border-t border-border pt-3">
-            <button
-              onClick={() => setShowWiki(!showWiki)}
-              className="flex items-center gap-1.5 w-full text-left mb-2"
-            >
+            <button onClick={() => setShowWiki(!showWiki)} className="flex items-center gap-1.5 w-full text-left mb-2">
               <Globe className="h-3.5 w-3.5 text-primary" />
               <span className="font-body text-xs font-semibold text-foreground uppercase tracking-wider">Wikipedia</span>
-              {showWiki ? (
-                <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" />
-              ) : (
-                <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-              )}
+              {showWiki ? <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" /> : <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />}
             </button>
-            <motion.div
-              initial={false}
-              animate={{ height: showWiki ? "auto" : 0, opacity: showWiki ? 1 : 0 }}
-              className="overflow-hidden"
-            >
+            <motion.div initial={false} animate={{ height: showWiki ? "auto" : 0, opacity: showWiki ? 1 : 0 }} className="overflow-hidden">
               {wikiLoading ? (
-                <div className="flex items-center gap-2 py-2">
-                  <div className="h-3 w-3 border border-primary border-t-transparent rounded-full animate-spin" />
-                  <span className="font-body text-xs text-muted-foreground">Loading snapshot…</span>
-                </div>
+                <SkeletonBlock lines={3} />
               ) : wiki ? (
                 <div>
-                  <p className="font-body text-xs text-muted-foreground leading-relaxed mb-2">
-                    {wiki.summary}
-                  </p>
-                  <a
-                    href={wiki.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-body text-[11px] text-primary hover:underline inline-flex items-center gap-1"
-                  >
+                  <p className="font-body text-xs text-muted-foreground leading-relaxed mb-2">{wiki.summary}</p>
+                  <a href={wiki.url} target="_blank" rel="noopener noreferrer" className="font-body text-[11px] text-primary hover:underline inline-flex items-center gap-1">
                     Read on Wikipedia <ExternalLink className="h-2.5 w-2.5" />
                   </a>
                 </div>
@@ -259,35 +199,9 @@ const DetailPanel = ({ item, accentColor, domainSlug, onClose, onSelectRelated }
           </div>
         )}
 
-        {/* Sources / Attribution with badges + copy citation */}
+        {/* Sources */}
         {item.sources && item.sources.length > 0 && (
-          <div className="border-t border-border pt-3">
-            <span className="font-body text-[10px] text-muted-foreground/60 uppercase tracking-wider">Sources</span>
-            <div className="mt-1.5 space-y-1.5">
-              {item.sources.map((src, i) => {
-                const srcType = inferSourceType(src.label, src.url);
-                return (
-                  <div key={i} className="flex items-center gap-1.5">
-                    <SourceConfidenceBadge type={srcType} />
-                    {src.url ? (
-                      <a
-                        href={src.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="font-body text-[11px] text-primary hover:underline flex items-center gap-1"
-                      >
-                        {src.label}
-                        <ExternalLink className="h-2.5 w-2.5" />
-                      </a>
-                    ) : (
-                      <span className="font-body text-[11px] text-muted-foreground">{src.label}</span>
-                    )}
-                    <CopyCitationButton label={src.label} url={src.url} />
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          <SourceList sources={item.sources} />
         )}
       </div>
     </motion.div>

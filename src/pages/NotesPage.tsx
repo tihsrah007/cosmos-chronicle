@@ -6,14 +6,12 @@ import {
   Pin,
   Trash2,
   Pencil,
-  Check,
-  X,
-  ChevronLeft,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useNotes, type Note } from "@/stores/notes";
+import { BackButton, PageHeader, EmptyState } from "@/components/ui/shared";
+import { useDebouncedValue } from "@/hooks/use-ui";
 
 function timeAgo(ts: number): string {
   const diff = Date.now() - ts;
@@ -26,29 +24,28 @@ function timeAgo(ts: number): string {
 }
 
 const NotesPage = () => {
-  const navigate = useNavigate();
   const { notes, updateNote, deleteNote, togglePin } = useNotes();
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebouncedValue(search, 200);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
 
   const filtered = useMemo(() => {
     let result = [...notes];
-    if (search) {
-      const q = search.toLowerCase();
+    if (debouncedSearch) {
+      const q = debouncedSearch.toLowerCase();
       result = result.filter(
         (n) =>
           n.text.toLowerCase().includes(q) ||
           n.itemId.toLowerCase().includes(q)
       );
     }
-    // Pinned first, then by updatedAt
     result.sort((a, b) => {
       if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
       return b.updatedAt - a.updatedAt;
     });
     return result;
-  }, [notes, search]);
+  }, [notes, debouncedSearch]);
 
   const startEdit = (note: Note) => {
     setEditingId(note.id);
@@ -62,7 +59,6 @@ const NotesPage = () => {
     setEditingId(null);
   };
 
-  // Parse itemId to get display label
   const parseItemId = (itemId: string) => {
     const idx = itemId.indexOf("-");
     if (idx === -1) return { domain: "", name: itemId };
@@ -76,28 +72,16 @@ const NotesPage = () => {
       <main className="pt-24 pb-16">
         <div className="container max-w-3xl">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <button
-              onClick={() => navigate(-1)}
-              className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors font-body text-sm mb-6"
-            >
-              <ChevronLeft className="h-4 w-4" /> Back
-            </button>
-
-            <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 rounded-lg bg-primary/10">
-                <StickyNote className="h-5 w-5 text-primary" />
-              </div>
-              <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground">
-                My Notes
-              </h1>
-            </div>
-            <p className="font-body text-muted-foreground max-w-2xl mb-6">
-              All your research notes in one place. Stored on this device only.
-            </p>
+            <BackButton />
+            <PageHeader
+              icon={StickyNote}
+              title="My Notes"
+              description="All your research notes in one place. Stored on this device only."
+            />
           </motion.div>
 
           {/* Search */}
-          <div className="relative mb-6">
+          <div className="relative mb-6 mt-6">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               type="text"
@@ -110,14 +94,15 @@ const NotesPage = () => {
 
           {/* Notes */}
           {filtered.length === 0 ? (
-            <div className="flex flex-col items-center py-20">
-              <StickyNote className="h-10 w-10 text-muted-foreground/30 mb-4" />
-              <p className="font-body text-sm text-muted-foreground">
-                {notes.length === 0
-                  ? "No notes yet. Add notes from any map detail panel or study board card."
-                  : "No notes match your search."}
-              </p>
-            </div>
+            <EmptyState
+              icon={StickyNote}
+              title={notes.length === 0 ? "No notes yet" : "No matches"}
+              description={
+                notes.length === 0
+                  ? "Add notes from any map detail panel or study board card."
+                  : "No notes match your search."
+              }
+            />
           ) : (
             <div className="space-y-3">
               {filtered.map((note, i) => {
@@ -134,7 +119,6 @@ const NotesPage = () => {
                         : "bg-card border-border"
                     }`}
                   >
-                    {/* Item reference */}
                     <div className="flex items-center gap-2 mb-2">
                       {domain && (
                         <span className="px-2 py-0.5 rounded-md bg-secondary border border-border font-body text-[10px] text-muted-foreground capitalize">
@@ -218,7 +202,6 @@ const NotesPage = () => {
             </div>
           )}
 
-          {/* Count */}
           {notes.length > 0 && (
             <p className="mt-6 font-body text-xs text-muted-foreground/50 text-center">
               {notes.length} note{notes.length !== 1 ? "s" : ""} total ·{" "}
