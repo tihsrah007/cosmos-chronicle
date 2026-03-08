@@ -320,6 +320,8 @@ const FullPageMap = ({
                   key={poi.name}
                   coordinates={poi.coordinates}
                   onClick={() => handleMarkerClick(poi)}
+                  onMouseEnter={() => setHoveredPOI(poi)}
+                  onMouseLeave={() => setHoveredPOI(null)}
                 >
                   <g style={{ cursor: "pointer" }} transform="translate(-6, -6)">
                     <circle
