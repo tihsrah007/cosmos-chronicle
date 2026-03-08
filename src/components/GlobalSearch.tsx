@@ -157,22 +157,45 @@ const GlobalSearch = ({ open, onClose }: GlobalSearchProps) => {
               {/* Results */}
               <div ref={listRef} className="max-h-[60vh] overflow-y-auto">
                 {query.length < 2 ? (
-                  <div className="px-5 py-8 text-center">
-                    <MapPin className="h-8 w-8 mx-auto text-muted-foreground/30 mb-3" />
-                    <p className="font-body text-sm text-muted-foreground">
-                      Start typing to explore facts, events, places, and entities
-                    </p>
-                    <div className="flex justify-center gap-3 mt-4">
-                      {Object.entries(domainIcons).map(([domain, Icon]) => (
-                        <button
-                          key={domain}
-                          onClick={() => { navigate(domainRoutes[domain]); onClose(); }}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary border border-border font-body text-xs text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors capitalize"
-                        >
-                          <Icon className="h-3.5 w-3.5" />
-                          {domain}
-                        </button>
-                      ))}
+                  <div className="px-5 py-6">
+                    {recentItems.length > 0 && (
+                      <div className="mb-5">
+                        <div className="flex items-center gap-1.5 mb-2">
+                          <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+                          <span className="font-body text-xs font-semibold text-muted-foreground uppercase tracking-wider">Recently Viewed</span>
+                        </div>
+                        <div className="space-y-1">
+                          {recentItems.slice(0, 8).map((r) => (
+                            <button
+                              key={r.path}
+                              onClick={() => { navigate(r.path); onClose(); }}
+                              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left hover:bg-secondary/60 transition-colors"
+                            >
+                              {r.domain && domainIcons[r.domain] ? (() => { const Icon = domainIcons[r.domain!]; return <Icon className="h-3.5 w-3.5 text-primary shrink-0" />; })() : <Clock className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />}
+                              <span className="font-body text-sm text-foreground truncate">{r.label}</span>
+                              {r.domain && <span className="font-body text-[10px] text-muted-foreground capitalize ml-auto shrink-0">{r.domain}</span>}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    <div className="text-center">
+                      <MapPin className="h-8 w-8 mx-auto text-muted-foreground/30 mb-3" />
+                      <p className="font-body text-sm text-muted-foreground">
+                        Start typing to explore facts, events, places, and entities
+                      </p>
+                      <div className="flex justify-center gap-3 mt-4">
+                        {Object.entries(domainIcons).map(([domain, Icon]) => (
+                          <button
+                            key={domain}
+                            onClick={() => { navigate(domainRoutes[domain]); onClose(); }}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary border border-border font-body text-xs text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors capitalize"
+                          >
+                            <Icon className="h-3.5 w-3.5" />
+                            {domain}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 ) : isError ? (
