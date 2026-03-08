@@ -31,6 +31,15 @@ export interface MapPOI {
   details?: string;
 }
 
+interface TimelineConfig {
+  minYear: number;
+  maxYear: number;
+  defaultYear: number;
+  eras: readonly { label: string; start: number; end: number }[];
+  accentColor: string;
+  formatYear?: (year: number) => string;
+}
+
 interface FullPageMapProps {
   title: string;
   subtitle: string;
@@ -43,6 +52,8 @@ interface FullPageMapProps {
   accentGradient: string;
   countryDescriptions?: Record<string, string>;
   backLabel?: string;
+  timeline?: TimelineConfig;
+  timelineOverlay?: ReactNode;
 }
 
 const categoryColors: Record<string, string> = {
