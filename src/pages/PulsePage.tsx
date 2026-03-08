@@ -13,9 +13,12 @@ import {
   AlertCircle,
   Inbox,
   Sparkles,
+  Plus,
+  Check,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { usePulse, getLastVisit, markVisit } from "@/hooks/use-pulse";
+import { useStudyBoard } from "@/stores/study-board";
 import type { PulseDomain, PulseSourceType, PulseUpdate } from "@/api/pulse-types";
 
 /* ── helpers ── */
@@ -72,7 +75,7 @@ const DOMAIN_COLORS: Record<PulseDomain, string> = {
 const PulsePage = () => {
   const navigate = useNavigate();
   const { data: updates, isLoading, isError } = usePulse();
-
+  const { addItem, hasItem } = useStudyBoard();
   const [activeDomain, setActiveDomain] = useState<PulseDomain | "all">("all");
   const [timeRange, setTimeRange] = useState<string>("30d");
   const [sourceFilter, setSourceFilter] = useState<PulseSourceType | "all">("all");
@@ -442,6 +445,32 @@ const PulsePage = () => {
                               Open on Map
                             </button>
                           )}
+                          {(() => {
+                            const boardId = `${u.domain}-${u.title}`;
+                            const onBoard = hasItem(boardId);
+                            return (
+                              <button
+                                onClick={() => {
+                                  if (!onBoard) {
+                                    addItem({
+                                      name: u.title,
+                                      domain: u.domain,
+                                      category: u.sourceType,
+                                      description: u.summary,
+                                      coordinates: u.coordinates,
+                                      sources: u.sourceUrl ? [{ label: u.sourceName, url: u.sourceUrl }] : [],
+                                    });
+                                  }
+                                }}
+                                disabled={onBoard}
+                                className={`flex items-center gap-1.5 font-body text-xs transition-colors ${
+                                  onBoard ? "text-primary/60" : "text-primary hover:underline"
+                                }`}
+                              >
+                                {onBoard ? <><Check className="h-3 w-3" /> Saved</> : <><Plus className="h-3 w-3" /> Study Board</>}
+                              </button>
+                            );
+                          })()}
                         </div>
                       </div>
                     </div>
