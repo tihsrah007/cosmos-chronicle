@@ -101,3 +101,23 @@
     box-shadow: var(--shadow-card);
   }
 }
+
+/* Print styles for Study Sheet export */
+@media print {
+  nav, .print\\:hidden, [class*="print:hidden"] {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 11pt;
+  }
+  .bg-background { background: white !important; }
+  .bg-card, .bg-secondary, .bg-secondary\\/40 { background: #f8f8f8 !important; }
+  .text-foreground { color: black !important; }
+  .text-muted-foreground { color: #444 !important; }
+  .text-primary { color: #b8860b !important; }
+  .border-border { border-color: #ddd !important; }
+  .shadow-glow, .shadow-lg, .shadow-card { box-shadow: none !important; }
+  .backdrop-blur-xl { backdrop-filter: none !important; }
+}
