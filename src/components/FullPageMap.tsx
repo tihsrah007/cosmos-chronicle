@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import TimelineSlider from "./TimelineSlider";
+import DetailPanel from "./DetailPanel";
 
 const GEO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
@@ -29,6 +30,10 @@ export interface MapPOI {
   description: string;
   category: string;
   details?: string;
+  facts?: string[];
+  keyFigures?: { label: string; value: string }[];
+  relatedItems?: string[];
+  sources?: { label: string; url?: string }[];
 }
 
 interface TimelineConfig {
@@ -485,42 +490,11 @@ const FullPageMap = ({
         {/* Info Panel */}
         <AnimatePresence>
           {selected && (
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-              className="absolute top-4 left-4 z-30 max-w-sm w-full rounded-xl border border-border bg-card/95 backdrop-blur-xl p-6 shadow-lg"
-            >
-              <button
-                onClick={() => setSelected(null)}
-                className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <X className="h-4 w-4" />
-              </button>
-              <span
-                className="inline-block px-2.5 py-0.5 rounded-md text-xs font-body font-semibold mb-3"
-                style={{
-                  backgroundColor: `${getMarkerColor(selected.category)}20`,
-                  color: getMarkerColor(selected.category),
-                }}
-              >
-                {selected.category}
-              </span>
-              <h3 className="font-display text-xl font-bold text-foreground mb-2">
-                {selected.name}
-              </h3>
-              <p className="font-body text-sm text-muted-foreground leading-relaxed mb-3">
-                {selected.description}
-              </p>
-              {selected.details && (
-                <div className="pt-3 border-t border-border">
-                  <p className="font-body text-xs text-muted-foreground leading-relaxed">
-                    {selected.details}
-                  </p>
-                </div>
-              )}
-            </motion.div>
+            <DetailPanel
+              item={selected}
+              accentColor={getMarkerColor(selected.category)}
+              onClose={() => setSelected(null)}
+            />
           )}
         </AnimatePresence>
 
