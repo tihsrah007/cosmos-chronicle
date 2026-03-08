@@ -92,6 +92,7 @@ const categoryColors: Record<string, string> = {
 const FullPageMap = ({
   title,
   subtitle,
+  domainSlug,
   pois,
   categories,
   markerColor,
