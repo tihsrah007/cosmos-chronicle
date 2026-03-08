@@ -22,6 +22,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import TimelineSlider from "@/components/TimelineSlider";
 import TimelinePlayer from "@/components/TimelinePlayer";
 import DetailPanel from "@/components/DetailPanel";
+import MapTip from "@/components/MapTip";
 import MapLoadingState from "@/components/MapLoadingState";
 import MapErrorState from "@/components/MapErrorState";
 import { useDomainItems } from "@/hooks/use-domain-items";
