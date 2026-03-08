@@ -12,6 +12,7 @@ import HistoryMap from "./pages/HistoryMap";
 import CosmologyMap from "./pages/CosmologyMap";
 import ExplorePage from "./pages/ExplorePage";
 import StudyBoardPage from "./pages/StudyBoardPage";
+import PulsePage from "./pages/PulsePage";
 import NotFound from "./pages/NotFound";
 
 const UniverseMap = lazy(() => import("./pages/UniverseMap"));
