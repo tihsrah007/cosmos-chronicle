@@ -106,6 +106,21 @@ const HistoryMap = () => {
     }
   }, [categories]);
 
+  // Auto-focus from global search navigation
+  useEffect(() => {
+    const state = location.state as { focusItem?: string; focusCoordinates?: [number, number] } | null;
+    if (state?.focusItem && allEvents.length > 0) {
+      const match = allEvents.find(e => e.name === state.focusItem);
+      if (match) {
+        handleEventClick(match);
+      } else if (state.focusCoordinates) {
+        setPosition({ coordinates: state.focusCoordinates, zoom: 5 });
+      }
+      // Clear state to prevent re-focus on re-render
+      window.history.replaceState({}, "");
+    }
+  }, [allEvents, location.state]);
+
   const timeFilteredEvents = useMemo(
     () => allEvents.filter((e) => e.year <= currentYear + 100),
     [allEvents, currentYear]
