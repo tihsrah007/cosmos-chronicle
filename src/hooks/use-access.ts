@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import fetchApi from "@/api/client";
+import fetchApi, { mutateApi } from "@/api/client";
 
 interface AccessConfig {
   pinRequired: boolean;
@@ -8,8 +8,7 @@ interface AccessConfig {
 }
 
 interface PinResponse {
-  valid: boolean;
-  message?: string;
+  ok: boolean;
 }
 
 export function useAccessConfig() {
@@ -24,15 +23,15 @@ export function useAccessConfig() {
   });
 }
 
-export async function verifyPin(pin: string): Promise<PinResponse> {
-  const res = await fetch("http://localhost:4000/api/access/pin", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ pin }),
-  });
-  if (!res.ok) {
-    if (res.status === 401) return { valid: false, message: "Invalid PIN" };
-    throw new Error("Failed to verify PIN");
+export async function verifyPin(pin: string): Promise<{ valid: boolean; message?: string }> {
+  try {
+    const res = await mutateApi<PinResponse>("/access/pin", "POST", { pin });
+    return { valid: res.ok };
+  } catch (err: any) {
+    // mutateApi throws on non-ok status; 401 means invalid PIN
+    if (err?.message?.includes("401")) {
+      return { valid: false, message: "Invalid PIN" };
+    }
+    throw err;
   }
-  return res.json();
 }

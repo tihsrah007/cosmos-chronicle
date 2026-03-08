@@ -1,6 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import fetchApi from "@/api/client";
 
+interface WikipediaApiResponse {
+  summary: {
+    title: string;
+    extract: string;
+    url: string;
+    thumbnailUrl?: string;
+    cached: boolean;
+    fetchedAt: string;
+  };
+}
+
 interface WikipediaSnapshot {
   title: string;
   summary: string;
@@ -14,10 +25,15 @@ export function useWikipediaSnapshot(title: string | undefined) {
     queryFn: async () => {
       if (!title) return null;
       try {
-        const res = await fetchApi<WikipediaSnapshot>(
+        const res = await fetchApi<WikipediaApiResponse>(
           `/enrichment/wikipedia?title=${encodeURIComponent(title)}`
         );
-        return res;
+        return {
+          title: res.summary.title,
+          summary: res.summary.extract,
+          url: res.summary.url,
+          thumbnail: res.summary.thumbnailUrl,
+        };
       } catch {
         return null;
       }
