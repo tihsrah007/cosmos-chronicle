@@ -424,7 +424,7 @@ const PulsePage = () => {
                         </div>
 
                         {/* Actions */}
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 flex-wrap">
                           {u.sourceUrl && (
                             <a
                               href={u.sourceUrl}
@@ -449,26 +449,48 @@ const PulsePage = () => {
                             const boardId = `${u.domain}-${u.title}`;
                             const onBoard = hasItem(boardId);
                             return (
-                              <button
-                                onClick={() => {
-                                  if (!onBoard) {
-                                    addItem({
-                                      name: u.title,
-                                      domain: u.domain,
-                                      category: u.sourceType,
-                                      description: u.summary,
-                                      coordinates: u.coordinates,
-                                      sources: u.sourceUrl ? [{ label: u.sourceName, url: u.sourceUrl }] : [],
-                                    });
-                                  }
-                                }}
-                                disabled={onBoard}
-                                className={`flex items-center gap-1.5 font-body text-xs transition-colors ${
-                                  onBoard ? "text-primary/60" : "text-primary hover:underline"
-                                }`}
-                              >
-                                {onBoard ? <><Check className="h-3 w-3" /> Saved</> : <><Plus className="h-3 w-3" /> Study Board</>}
-                              </button>
+                              <>
+                                <button
+                                  onClick={() => {
+                                    if (!onBoard) {
+                                      addItem({
+                                        name: u.title,
+                                        domain: u.domain,
+                                        category: u.sourceType,
+                                        description: u.summary,
+                                        coordinates: u.coordinates,
+                                        sources: u.sourceUrl ? [{ label: u.sourceName, url: u.sourceUrl }] : [],
+                                      });
+                                    }
+                                  }}
+                                  disabled={onBoard}
+                                  className={`flex items-center gap-1.5 font-body text-xs transition-colors ${
+                                    onBoard ? "text-primary/60" : "text-primary hover:underline"
+                                  }`}
+                                >
+                                  {onBoard ? <><Check className="h-3 w-3" /> Saved</> : <><Plus className="h-3 w-3" /> Study Board</>}
+                                </button>
+                                {/* Save + Open combo */}
+                                {!onBoard && u.mapDomain && (
+                                  <button
+                                    onClick={() => {
+                                      addItem({
+                                        name: u.title,
+                                        domain: u.domain,
+                                        category: u.sourceType,
+                                        description: u.summary,
+                                        coordinates: u.coordinates,
+                                        sources: u.sourceUrl ? [{ label: u.sourceName, url: u.sourceUrl }] : [],
+                                      });
+                                      handleOpenOnMap(u);
+                                    }}
+                                    className="flex items-center gap-1.5 font-body text-xs text-primary hover:underline"
+                                  >
+                                    <Plus className="h-3 w-3" />
+                                    Save & Open
+                                  </button>
+                                )}
+                              </>
                             );
                           })()}
                         </div>

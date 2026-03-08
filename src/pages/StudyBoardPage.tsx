@@ -161,14 +161,33 @@ const StudyBoardPage = () => {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {newThisWeek.map((u) => (
-                <Link
+                <div
                   key={u.id}
-                  to="/pulse"
                   className="rounded-lg bg-card border border-border p-3 hover:border-primary/30 transition-colors"
                 >
                   <h4 className="font-display text-xs font-bold text-foreground mb-1 line-clamp-1">{u.title}</h4>
-                  <p className="font-body text-[10px] text-muted-foreground line-clamp-1">{u.summary}</p>
-                </Link>
+                  <p className="font-body text-[10px] text-muted-foreground line-clamp-1 mb-2">{u.summary}</p>
+                  <div className="flex items-center gap-2">
+                    {u.sourceUrl && (
+                      <a
+                        href={u.sourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-body text-[10px] text-primary hover:underline inline-flex items-center gap-0.5"
+                      >
+                        <ExternalLink className="h-2.5 w-2.5" /> Source
+                      </a>
+                    )}
+                    {u.mapDomain && (
+                      <button
+                        onClick={() => navigate(`/${u.mapDomain}`, { state: { focusItem: u.mapTarget, focusCoordinates: u.coordinates } })}
+                        className="font-body text-[10px] text-primary hover:underline inline-flex items-center gap-0.5"
+                      >
+                        <MapPin className="h-2.5 w-2.5" /> Map
+                      </button>
+                    )}
+                  </div>
+                </div>
               ))}
             </div>
           </motion.div>
