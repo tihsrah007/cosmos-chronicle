@@ -8,6 +8,8 @@ import GeopoliticsMap from "./pages/GeopoliticsMap";
 import GeologyMap from "./pages/GeologyMap";
 import HistoryMap from "./pages/HistoryMap";
 import CosmologyMap from "./pages/CosmologyMap";
+import ExplorePage from "./pages/ExplorePage";
+import UniverseMap from "./pages/UniverseMap";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +26,8 @@ const App = () => (
           <Route path="/geology" element={<GeologyMap />} />
           <Route path="/history" element={<HistoryMap />} />
           <Route path="/cosmology" element={<CosmologyMap />} />
+          <Route path="/explore" element={<ExplorePage />} />
+          <Route path="/universe" element={<UniverseMap />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

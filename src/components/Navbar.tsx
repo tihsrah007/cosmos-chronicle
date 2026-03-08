@@ -9,6 +9,8 @@ const navItems = [
   { label: "Geopolitics", href: "/geopolitics" },
   { label: "Geology", href: "/geology" },
   { label: "Cosmology", href: "/cosmology" },
+  { label: "Universe", href: "/universe" },
+  { label: "Explore", href: "/explore" },
 ];
 
 const Navbar = () => {
