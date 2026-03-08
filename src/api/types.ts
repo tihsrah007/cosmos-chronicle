@@ -69,6 +69,38 @@ export interface ApiContinentalPosition {
   }[];
 }
 
+// Lesson & Slide types
+export interface ApiSlide {
+  id: string;
+  lessonId: string;
+  order: number;
+  title: string;
+  content: string;
+  mapItemIds: string[];
+  imageUrl?: string;
+}
+
+export interface ApiLesson {
+  id: string;
+  domain: string;
+  title: string;
+  description: string;
+  coverImage?: string;
+  slides: ApiSlide[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ApiStudentProgress {
+  lessonId: string;
+  studentId: string;
+  completedSlides: number;
+  totalSlides: number;
+  lastSlideId?: string;
+  completionPercent: number;
+  updatedAt: string;
+}
+
 // Wrapped backend response types
 export interface DomainsResponse {
   domains: ApiDomain[];
@@ -92,4 +124,25 @@ export interface DomainTimelineResponse {
 export interface CountriesResponse {
   countries: ApiCountryInfo[];
   total: number;
+}
+
+export interface LessonsResponse {
+  lessons: ApiLesson[];
+  total: number;
+}
+
+export interface LessonResponse {
+  lesson: ApiLesson;
+}
+
+export interface SlideResponse {
+  slide: ApiSlide;
+}
+
+export interface StudentProgressResponse {
+  progress: ApiStudentProgress[];
+}
+
+export interface StudentLessonProgressResponse {
+  progress: ApiStudentProgress;
 }
