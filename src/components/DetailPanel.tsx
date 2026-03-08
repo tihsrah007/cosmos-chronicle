@@ -1,20 +1,25 @@
 import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { X, ChevronDown, ChevronUp, ExternalLink, BarChart3, BookOpen, Link2, Globe } from "lucide-react";
+import { X, ChevronDown, ChevronUp, ExternalLink, BarChart3, BookOpen, Link2, Globe, Plus, Check } from "lucide-react";
 import type { MapPOI } from "./FullPageMap";
 import { useWikipediaSnapshot } from "@/hooks/use-wikipedia";
+import { useStudyBoard, makeStudyBoardId } from "@/stores/study-board";
 
 interface DetailPanelProps {
   item: MapPOI;
   accentColor: string;
+  domainSlug: string;
   onClose: () => void;
   onSelectRelated?: (name: string) => void;
 }
 
-const DetailPanel = ({ item, accentColor, onClose, onSelectRelated }: DetailPanelProps) => {
+const DetailPanel = ({ item, accentColor, domainSlug, onClose, onSelectRelated }: DetailPanelProps) => {
   const [expandedDetails, setExpandedDetails] = useState(false);
   const [showWiki, setShowWiki] = useState(false);
   const { data: wiki, isLoading: wikiLoading } = useWikipediaSnapshot(item.name);
+  const { addItem, hasItem } = useStudyBoard();
+  const itemId = makeStudyBoardId(domainSlug, item.name);
+  const isOnBoard = hasItem(itemId);
 
   const handleRelatedClick = useCallback((name: string) => {
     if (onSelectRelated) {
