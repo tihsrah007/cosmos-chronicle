@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import TimelineSlider from "@/components/TimelineSlider";
+import TimelinePlayer from "@/components/TimelinePlayer";
 import DetailPanel from "@/components/DetailPanel";
 import MapLoadingState from "@/components/MapLoadingState";
 import MapErrorState from "@/components/MapErrorState";
