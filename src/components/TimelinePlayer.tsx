@@ -88,21 +88,20 @@ const TimelinePlayer = ({
 
     const baseSpeed = range / 60; // traverse full range in ~60 seconds at 1x
 
+    let localYear = yearRef.current;
+
     const tick = (timestamp: number) => {
       if (lastTimeRef.current === 0) lastTimeRef.current = timestamp;
       const dt = (timestamp - lastTimeRef.current) / 1000;
       lastTimeRef.current = timestamp;
 
-      const yearDelta = baseSpeed * speed * dt;
-      onYearChange((prev: number) => {
-        const next = prev + yearDelta;
-        if (next >= maxYear) {
-          setIsPlaying(false);
-          return maxYear;
-        }
-        return Math.round(next);
-      });
-
+      localYear += baseSpeed * speed * dt;
+      if (localYear >= maxYear) {
+        setIsPlaying(false);
+        onYearChange(maxYear);
+        return;
+      }
+      onYearChange(Math.round(localYear));
       animRef.current = requestAnimationFrame(tick);
     };
 
