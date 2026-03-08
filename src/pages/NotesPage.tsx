@@ -12,6 +12,7 @@ import Footer from "@/components/Footer";
 import { useNotes, type Note } from "@/stores/notes";
 import { BackButton, PageHeader, EmptyState } from "@/components/ui/shared";
 import { useDebouncedValue } from "@/hooks/use-ui";
+import PageTip from "@/components/PageTip";
 
 function timeAgo(ts: number): string {
   const diff = Date.now() - ts;

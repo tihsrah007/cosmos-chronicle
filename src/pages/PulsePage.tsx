@@ -22,6 +22,7 @@ import { useStudyBoard } from "@/stores/study-board";
 import type { PulseDomain, PulseSourceType, PulseUpdate } from "@/api/pulse-types";
 import AddToTrailButton from "@/components/AddToTrailButton";
 import { SourceConfidenceBadge, CopyCitationButton, inferSourceType } from "@/components/SourceBadge";
+import PageTip from "@/components/PageTip";
 
 /* ── helpers ── */
 

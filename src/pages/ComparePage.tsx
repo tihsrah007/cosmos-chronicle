@@ -19,6 +19,7 @@ import AddToTrailButton from "@/components/AddToTrailButton";
 import SourceList from "@/components/SourceList";
 import { loadCompare, saveCompare, clearCompare } from "@/stores/compare";
 import { BackButton, PageHeader, DomainBadge, EmptyState } from "@/components/ui/shared";
+import PageTip from "@/components/PageTip";
 
 const domainColors: Record<string, string> = {
   history: "hsl(38, 90%, 55%)",
