@@ -8,6 +8,8 @@ import GeopoliticsMap from "./pages/GeopoliticsMap";
 import GeologyMap from "./pages/GeologyMap";
 import HistoryMap from "./pages/HistoryMap";
 import CosmologyMap from "./pages/CosmologyMap";
+import ExplorePage from "./pages/ExplorePage";
+import UniverseMap from "./pages/UniverseMap";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
