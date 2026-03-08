@@ -48,6 +48,7 @@ interface TimelineConfig {
 interface FullPageMapProps {
   title: string;
   subtitle: string;
+  domainSlug: string;
   pois: MapPOI[];
   categories: readonly string[];
   markerColor: string;
