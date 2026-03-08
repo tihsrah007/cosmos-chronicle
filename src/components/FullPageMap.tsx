@@ -1,4 +1,4 @@
-import { useState, useCallback, memo, useMemo, ReactNode } from "react";
+import { useState, useCallback, memo, useMemo, ReactNode, useEffect } from "react";
 import {
   ComposableMap,
   Geographies,
@@ -18,7 +18,7 @@ import {
   MapPin,
   Clock,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import TimelineSlider from "./TimelineSlider";
 import DetailPanel from "./DetailPanel";
 
@@ -104,6 +104,7 @@ const FullPageMap = ({
   timelineOverlay,
 }: FullPageMapProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [selected, setSelected] = useState<MapPOI | null>(null);
   const [hoveredCountry, setHoveredCountry] = useState<string | null>(null);
   const [position, setPosition] = useState<{
@@ -119,6 +120,21 @@ const FullPageMap = ({
   const [hoveredPOI, setHoveredPOI] = useState<MapPOI | null>(null);
   const [showTimeline, setShowTimeline] = useState(!!timeline);
   const [currentYear, setCurrentYear] = useState(timeline?.defaultYear ?? 0);
+
+  // Auto-focus from global search navigation
+  useEffect(() => {
+    const state = location.state as { focusItem?: string; focusCoordinates?: [number, number] } | null;
+    if (state?.focusItem && pois.length > 0) {
+      const match = pois.find(p => p.name === state.focusItem);
+      if (match) {
+        setSelected(match);
+        setPosition({ coordinates: match.coordinates, zoom: 5 });
+      } else if (state.focusCoordinates) {
+        setPosition({ coordinates: state.focusCoordinates, zoom: 5 });
+      }
+      window.history.replaceState({}, "");
+    }
+  }, [pois, location.state]);
 
   const filteredPOIs = pois.filter(
     (p) =>

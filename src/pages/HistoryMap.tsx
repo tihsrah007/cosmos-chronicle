@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, memo } from "react";
+import { useState, useCallback, useMemo, memo, useEffect } from "react";
 import {
   ComposableMap,
   Geographies,
@@ -18,8 +18,9 @@ import {
   MapPin,
   Clock,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import TimelineSlider from "@/components/TimelineSlider";
+import DetailPanel from "@/components/DetailPanel";
 import MapLoadingState from "@/components/MapLoadingState";
 import MapErrorState from "@/components/MapErrorState";
 import { useDomainItems } from "@/hooks/use-domain-items";
@@ -55,11 +56,16 @@ function apiItemToHistoryEvent(item: ApiMapItem): HistoryEvent {
     year: item.year ?? 0,
     yearLabel: item.yearLabel ?? String(item.year ?? 0),
     details: item.details,
+    facts: item.facts,
+    keyFigures: item.keyFigures,
+    relatedItems: item.relatedItems,
+    sources: item.sources,
   };
 }
 
 const HistoryMap = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const itemsQuery = useDomainItems("history");
   const timelineQuery = useDomainTimeline("history");
 
@@ -99,6 +105,21 @@ const HistoryMap = () => {
       setActiveCategories(new Set(categories));
     }
   }, [categories]);
+
+  // Auto-focus from global search navigation
+  useEffect(() => {
+    const state = location.state as { focusItem?: string; focusCoordinates?: [number, number] } | null;
+    if (state?.focusItem && allEvents.length > 0) {
+      const match = allEvents.find(e => e.name === state.focusItem);
+      if (match) {
+        handleEventClick(match);
+      } else if (state.focusCoordinates) {
+        setPosition({ coordinates: state.focusCoordinates, zoom: 5 });
+      }
+      // Clear state to prevent re-focus on re-render
+      window.history.replaceState({}, "");
+    }
+  }, [allEvents, location.state]);
 
   const timeFilteredEvents = useMemo(
     () => allEvents.filter((e) => e.year <= currentYear + 100),
@@ -416,46 +437,21 @@ const HistoryMap = () => {
         {/* Info Panel */}
         <AnimatePresence>
           {selected && (
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="absolute top-4 left-4 z-30 max-w-sm w-full rounded-xl border border-border bg-card/95 backdrop-blur-xl p-6 shadow-lg"
-            >
-              <button
-                onClick={() => setSelected(null)}
-                className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <X className="h-4 w-4" />
-              </button>
-              <div className="flex items-center gap-2 mb-3">
-                <span
-                  className="inline-block px-2.5 py-0.5 rounded-md text-xs font-body font-semibold"
-                  style={{
-                    backgroundColor: `${getColor(selected.category)}20`,
-                    color: getColor(selected.category),
-                  }}
-                >
-                  {selected.category}
-                </span>
-                <span className="text-xs font-body text-muted-foreground">
-                  {selected.yearLabel}
-                </span>
-              </div>
-              <h3 className="font-display text-xl font-bold text-foreground mb-2">
-                {selected.name}
-              </h3>
-              <p className="font-body text-sm text-muted-foreground leading-relaxed mb-3">
-                {selected.description}
-              </p>
-              {selected.details && (
-                <div className="pt-3 border-t border-border">
-                  <p className="font-body text-xs text-muted-foreground leading-relaxed">
-                    {selected.details}
-                  </p>
-                </div>
-              )}
-            </motion.div>
+            <DetailPanel
+              item={{
+                name: selected.name,
+                coordinates: selected.coordinates,
+                description: selected.description,
+                category: selected.category,
+                details: selected.details,
+                facts: selected.facts,
+                keyFigures: selected.keyFigures,
+                relatedItems: selected.relatedItems,
+                sources: selected.sources,
+              }}
+              accentColor={getColor(selected.category)}
+              onClose={() => setSelected(null)}
+            />
           )}
         </AnimatePresence>
 
