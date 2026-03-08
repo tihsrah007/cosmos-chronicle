@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Compass, Menu, X, Search, StickyNote } from "lucide-react";
+import { Compass, Menu, X, Search, StickyNote, Route, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import GlobalSearch from "./GlobalSearch";
+import GlossaryDrawer from "./GlossaryDrawer";
 import { useNotes } from "@/stores/notes";
+import { useTrails } from "@/stores/trails";
 
 const navItems = [
   { label: "History", href: "/history" },
@@ -20,9 +22,10 @@ const navItems = [
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [glossaryOpen, setGlossaryOpen] = useState(false);
   const { notes } = useNotes();
+  const { trails } = useTrails();
 
-  // ⌘K / Ctrl+K shortcut
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
@@ -59,6 +62,20 @@ const Navbar = () => {
                 {item.label}
               </Link>
             ))}
+            {/* Trails */}
+            <Link
+              to="/trails"
+              className="relative font-body text-sm tracking-wide text-muted-foreground transition-colors hover:text-primary flex items-center gap-1"
+              aria-label={`Trails (${trails.length})`}
+            >
+              <Route className="h-3.5 w-3.5" />
+              <span>Trails</span>
+              {trails.length > 0 && (
+                <span className="absolute -top-1.5 -right-2.5 min-w-[16px] h-4 flex items-center justify-center px-1 rounded-full bg-primary text-primary-foreground font-body text-[9px] font-bold">
+                  {trails.length}
+                </span>
+              )}
+            </Link>
             {/* Notes with badge */}
             <Link
               to="/notes"
@@ -73,6 +90,15 @@ const Navbar = () => {
                 </span>
               )}
             </Link>
+            {/* Glossary */}
+            <button
+              onClick={() => setGlossaryOpen(true)}
+              className="font-body text-sm tracking-wide text-muted-foreground transition-colors hover:text-primary flex items-center gap-1"
+              aria-label="Open glossary"
+            >
+              <BookOpen className="h-3.5 w-3.5" />
+              <span>Glossary</span>
+            </button>
             <button
               onClick={() => setSearchOpen(true)}
               className="flex items-center gap-2 rounded-lg bg-secondary border border-border px-3 py-1.5 font-body text-sm text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all"
@@ -86,6 +112,17 @@ const Navbar = () => {
 
           {/* Mobile toggle */}
           <div className="flex items-center gap-2 md:hidden">
+            <button onClick={() => setGlossaryOpen(true)} className="p-2 text-muted-foreground hover:text-foreground" aria-label="Glossary">
+              <BookOpen className="h-5 w-5" />
+            </button>
+            <Link to="/trails" className="relative p-2 text-muted-foreground hover:text-foreground" aria-label="Trails">
+              <Route className="h-5 w-5" />
+              {trails.length > 0 && (
+                <span className="absolute top-0.5 right-0.5 min-w-[14px] h-3.5 flex items-center justify-center px-0.5 rounded-full bg-primary text-primary-foreground text-[8px] font-bold">
+                  {trails.length}
+                </span>
+              )}
+            </Link>
             <Link to="/notes" className="relative p-2 text-muted-foreground hover:text-foreground" aria-label="Notes">
               <StickyNote className="h-5 w-5" />
               {notes.length > 0 && (
@@ -122,6 +159,18 @@ const Navbar = () => {
                 </Link>
               ))}
               <Link
+                to="/trails"
+                onClick={() => setOpen(false)}
+                className="font-body text-base text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
+              >
+                Trails
+                {trails.length > 0 && (
+                  <span className="px-1.5 py-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+                    {trails.length}
+                  </span>
+                )}
+              </Link>
+              <Link
                 to="/notes"
                 onClick={() => setOpen(false)}
                 className="font-body text-base text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
@@ -138,8 +187,8 @@ const Navbar = () => {
         )}
       </motion.nav>
 
-      {/* Global keyboard shortcut */}
       <GlobalSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
+      <GlossaryDrawer open={glossaryOpen} onClose={() => setGlossaryOpen(false)} />
     </>
   );
 };

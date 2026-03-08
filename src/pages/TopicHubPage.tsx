@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -9,11 +9,15 @@ import {
   ExternalLink,
   Zap,
   Lightbulb,
+  Printer,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { TOPIC_HUBS } from "@/data/topicHubs";
 import { usePulse } from "@/hooks/use-pulse";
+import AddToTrailButton from "@/components/AddToTrailButton";
+import GlossaryTooltip from "@/components/GlossaryTooltip";
+import { SourceConfidenceBadge, CopyCitationButton, inferSourceType } from "@/components/SourceBadge";
 
 const domainColors: Record<string, string> = {
   geology: "hsl(25, 70%, 50%)",
@@ -46,6 +50,17 @@ const TopicHubPage = () => {
       .slice(0, 5);
   }, [pulseUpdates, hub]);
 
+  const handlePrint = useCallback(() => {
+    window.print();
+  }, []);
+
+  const handleOpenAllSources = useCallback(() => {
+    if (!hub) return;
+    hub.sources.forEach((src) => {
+      if (src.url) window.open(src.url, "_blank", "noopener,noreferrer");
+    });
+  }, [hub]);
+
   if (!hub) {
     return (
       <div className="min-h-screen bg-background">
@@ -71,12 +86,31 @@ const TopicHubPage = () => {
         <div className="container max-w-4xl">
           {/* Back */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <button
-              onClick={() => navigate(-1)}
-              className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors font-body text-sm mb-6"
-            >
-              <ChevronLeft className="h-4 w-4" /> Back
-            </button>
+            <div className="flex items-center justify-between mb-6">
+              <button
+                onClick={() => navigate(-1)}
+                className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors font-body text-sm"
+              >
+                <ChevronLeft className="h-4 w-4" /> Back
+              </button>
+              <div className="flex items-center gap-2 print:hidden">
+                <AddToTrailButton
+                  step={{
+                    type: "topic",
+                    label: hub.title,
+                    ref: hub.slug,
+                    domain: hub.domain,
+                  }}
+                />
+                <button
+                  onClick={handlePrint}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-secondary border border-border text-muted-foreground hover:text-foreground hover:border-primary/30 font-body text-[11px] font-medium transition-colors"
+                  aria-label="Print study sheet"
+                >
+                  <Printer className="h-3 w-3" /> Study Sheet
+                </button>
+              </div>
+            </div>
 
             {/* Header */}
             <div className="flex items-center gap-2 mb-2">
@@ -90,9 +124,9 @@ const TopicHubPage = () => {
             <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-3">
               {hub.title}
             </h1>
-            <p className="font-body text-muted-foreground leading-relaxed max-w-3xl mb-10">
-              {hub.overview}
-            </p>
+            <div className="font-body text-muted-foreground leading-relaxed max-w-3xl mb-10">
+              <GlossaryTooltip text={hub.overview} />
+            </div>
           </motion.div>
 
           {/* Key Concepts */}
@@ -113,7 +147,9 @@ const TopicHubPage = () => {
                   className="rounded-xl border border-border bg-card p-4"
                 >
                   <h3 className="font-display text-sm font-bold text-foreground mb-1">{c.term}</h3>
-                  <p className="font-body text-xs text-muted-foreground leading-relaxed">{c.definition}</p>
+                  <div className="font-body text-xs text-muted-foreground leading-relaxed">
+                    <GlossaryTooltip text={c.definition} />
+                  </div>
                 </div>
               ))}
             </div>
@@ -207,7 +243,7 @@ const TopicHubPage = () => {
             </motion.section>
           )}
 
-          {/* Sources */}
+          {/* Sources with badges + copy citation + open all */}
           {hub.sources.length > 0 && (
             <motion.section
               initial={{ opacity: 0, y: 15 }}
@@ -218,24 +254,37 @@ const TopicHubPage = () => {
               <div className="flex items-center gap-2 mb-4">
                 <BookOpen className="h-4 w-4 text-primary" />
                 <h2 className="font-display text-xl font-bold text-foreground">Sources</h2>
+                {hub.sources.some((s) => s.url) && (
+                  <button
+                    onClick={handleOpenAllSources}
+                    className="ml-auto font-body text-[10px] text-primary hover:underline print:hidden"
+                  >
+                    Open all sources ↗
+                  </button>
+                )}
               </div>
-              <div className="space-y-1.5">
-                {hub.sources.map((src, i) => (
-                  <div key={i}>
-                    {src.url ? (
-                      <a
-                        href={src.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="font-body text-sm text-primary hover:underline inline-flex items-center gap-1"
-                      >
-                        {src.label} <ExternalLink className="h-3 w-3" />
-                      </a>
-                    ) : (
-                      <span className="font-body text-sm text-muted-foreground">{src.label}</span>
-                    )}
-                  </div>
-                ))}
+              <div className="space-y-2">
+                {hub.sources.map((src, i) => {
+                  const srcType = inferSourceType(src.label, src.url);
+                  return (
+                    <div key={i} className="flex items-center gap-2">
+                      <SourceConfidenceBadge type={srcType} />
+                      {src.url ? (
+                        <a
+                          href={src.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-body text-sm text-primary hover:underline inline-flex items-center gap-1"
+                        >
+                          {src.label} <ExternalLink className="h-3 w-3" />
+                        </a>
+                      ) : (
+                        <span className="font-body text-sm text-muted-foreground">{src.label}</span>
+                      )}
+                      <CopyCitationButton label={src.label} url={src.url} />
+                    </div>
+                  );
+                })}
               </div>
             </motion.section>
           )}
@@ -245,6 +294,7 @@ const TopicHubPage = () => {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.35 }}
+            className="print:hidden"
           >
             <h2 className="font-display text-xl font-bold text-foreground mb-4">Explore More Topics</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
