@@ -492,13 +492,22 @@ const PulsePage = () => {
                                     }}
                                     className="flex items-center gap-1.5 font-body text-xs text-primary hover:underline"
                                   >
-                                    <Plus className="h-3 w-3" />
+                                   <Plus className="h-3 w-3" />
                                     Save & Open
                                   </button>
                                 )}
                               </>
                             );
                           })()}
+                          <AddToTrailButton
+                            compact
+                            step={{
+                              type: "pulse",
+                              label: u.title,
+                              ref: u.id,
+                              domain: u.domain,
+                            }}
+                          />
                         </div>
                       </div>
                     </div>
