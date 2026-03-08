@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import fetchApi from "@/api/client";
-import type { ApiDomainTimeline } from "@/api/types";
+import type { DomainTimelineResponse } from "@/api/types";
 
 export function useDomainTimeline(slug: string) {
-  return useQuery<ApiDomainTimeline>({
+  return useQuery<DomainTimelineResponse>({
     queryKey: ["domains", slug, "timeline"],
-    queryFn: () => fetchApi<ApiDomainTimeline>(`/domains/${slug}/timeline`),
+    queryFn: () => fetchApi<DomainTimelineResponse>(`/domains/${slug}/timeline`),
     staleTime: 5 * 60 * 1000,
     retry: 1,
     enabled: !!slug,

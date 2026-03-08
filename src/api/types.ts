@@ -5,7 +5,7 @@ export interface ApiDomain {
   title: string;
   description: string;
   image: string;
-  icon: string; // lucide icon name
+  icon: string;
   facts: string[];
   mapConfig: {
     markerColor: string;
@@ -19,12 +19,12 @@ export interface ApiDomain {
     minYear: number;
     maxYear: number;
     defaultYear: number;
-    eras: TimelineEra[];
+    eras: ApiTimelineEra[];
     accentColor: string;
   };
 }
 
-export interface TimelineEra {
+export interface ApiTimelineEra {
   label: string;
   start: number;
   end: number;
@@ -36,10 +36,8 @@ export interface ApiMapItem {
   description: string;
   category: string;
   details?: string;
-  // History-specific
   year?: number;
   yearLabel?: string;
-  // Geology timeline-specific
   startYear?: number;
   endYear?: number;
   yearMya?: number;
@@ -71,8 +69,27 @@ export interface ApiContinentalPosition {
   }[];
 }
 
-export interface ApiDomainTimeline {
-  eras: TimelineEra[];
+// Wrapped backend response types
+export interface DomainsResponse {
+  domains: ApiDomain[];
+}
+
+export interface DomainResponse {
+  domain: ApiDomain;
+}
+
+export interface DomainItemsResponse {
+  items: ApiMapItem[];
+  total: number;
+}
+
+export interface DomainTimelineResponse {
+  eras: ApiTimelineEra[];
   events: ApiTimelineEvent[];
-  continentalPositions?: ApiContinentalPosition[];
+  total: number;
+}
+
+export interface CountriesResponse {
+  countries: ApiCountryInfo[];
+  total: number;
 }
