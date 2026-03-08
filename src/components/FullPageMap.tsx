@@ -128,6 +128,9 @@ const FullPageMap = ({
   const [hoveredPOI, setHoveredPOI] = useState<MapPOI | null>(null);
   const [showTimeline, setShowTimeline] = useState(!!timeline);
   const [currentYear, setCurrentYear] = useState(timeline?.defaultYear ?? 0);
+  const [showLayers, setShowLayers] = useState(false);
+  const [sourceOnlyMode, setSourceOnlyMode] = useState(false);
+  const [focusMode, setFocusMode] = useState(false);
 
   // Auto-focus from global search navigation
   useEffect(() => {
