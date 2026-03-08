@@ -112,6 +112,8 @@ const FullPageMap = ({
   const [showFilters, setShowFilters] = useState(false);
   const [showList, setShowList] = useState(false);
   const [hoveredPOI, setHoveredPOI] = useState<MapPOI | null>(null);
+  const [showTimeline, setShowTimeline] = useState(!!timeline);
+  const [currentYear, setCurrentYear] = useState(timeline?.defaultYear ?? 0);
 
   const filteredPOIs = pois.filter(
     (p) =>
