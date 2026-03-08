@@ -119,9 +119,16 @@ const WorldMap = () => {
           <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
             Explore the <span className="text-gradient-amber">World</span>
           </h2>
-          <p className="font-body text-muted-foreground max-w-xl mx-auto">
+          <p className="font-body text-muted-foreground max-w-xl mx-auto mb-6">
             Toggle between geopolitical hotspots and geological wonders. Click markers to dive deeper.
           </p>
+          <Link
+            to={mode === "geopolitics" ? "/geopolitics" : "/geology"}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-primary-foreground font-body text-sm font-medium hover:opacity-90 transition-opacity shadow-glow"
+          >
+            <ExternalLink className="h-4 w-4" />
+            Open Full {modeConfig[mode].label} Map
+          </Link>
         </motion.div>
 
         {/* Mode Toggle */}
