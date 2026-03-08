@@ -2,7 +2,6 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Route,
-  ChevronLeft,
   Plus,
   Trash2,
   Pencil,
@@ -16,10 +15,10 @@ import {
   StickyNote,
   ArrowLeftRight,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useTrails, type ResearchTrail } from "@/stores/trails";
+import { BackButton, PageHeader, EmptyState } from "@/components/ui/shared";
 
 const stepTypeIcons: Record<string, typeof MapPin> = {
   topic: Lightbulb,
@@ -48,7 +47,6 @@ function timeAgo(ts: number): string {
 }
 
 const TrailsPage = () => {
-  const navigate = useNavigate();
   const { trails, createTrail, deleteTrail, renameTrail, removeStep, reorderSteps, activeTrailId, setActive } = useTrails();
   const [newTitle, setNewTitle] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -79,28 +77,16 @@ const TrailsPage = () => {
       <main className="pt-24 pb-16">
         <div className="container max-w-3xl">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <button
-              onClick={() => navigate(-1)}
-              className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors font-body text-sm mb-6"
-            >
-              <ChevronLeft className="h-4 w-4" /> Back
-            </button>
-
-            <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 rounded-lg bg-primary/10">
-                <Route className="h-5 w-5 text-primary" />
-              </div>
-              <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground">
-                Research Trails
-              </h1>
-            </div>
-            <p className="font-body text-muted-foreground max-w-2xl mb-8">
-              Connect topics, map items, pulse updates, and notes into ordered research paths. Saved locally on this device.
-            </p>
+            <BackButton />
+            <PageHeader
+              icon={Route}
+              title="Research Trails"
+              description="Connect topics, map items, pulse updates, and notes into ordered research paths. Saved locally on this device."
+            />
           </motion.div>
 
           {/* Create new */}
-          <div className="flex gap-2 mb-8">
+          <div className="flex gap-2 mb-8 mt-8">
             <input
               type="text"
               placeholder="New trail title…"
@@ -119,16 +105,15 @@ const TrailsPage = () => {
 
           {/* Trail list */}
           {trails.length === 0 ? (
-            <div className="flex flex-col items-center py-20">
-              <Route className="h-10 w-10 text-muted-foreground/30 mb-4" />
-              <p className="font-body text-sm text-muted-foreground">
-                No trails yet. Create one above and add steps from topic hubs, maps, or pulse.
-              </p>
-            </div>
+            <EmptyState
+              icon={Route}
+              title="No trails yet"
+              description="Create one above and add steps from topic hubs, maps, or pulse."
+            />
           ) : (
             <div className="space-y-4">
               <AnimatePresence mode="popLayout">
-                {trails.map((trail, ti) => {
+                {trails.map((trail) => {
                   const isActive = activeTrailId === trail.id;
                   return (
                     <motion.div
@@ -156,8 +141,8 @@ const TrailsPage = () => {
                                 className="flex-1 px-2 py-1 rounded bg-secondary border border-border font-display text-base font-bold text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                                 autoFocus
                               />
-                              <button onClick={saveRename} className="p-1 text-primary"><Check className="h-4 w-4" /></button>
-                              <button onClick={() => setEditingId(null)} className="p-1 text-muted-foreground"><X className="h-4 w-4" /></button>
+                              <button onClick={saveRename} className="p-1 text-primary" aria-label="Save name"><Check className="h-4 w-4" /></button>
+                              <button onClick={() => setEditingId(null)} className="p-1 text-muted-foreground" aria-label="Cancel rename"><X className="h-4 w-4" /></button>
                             </div>
                           ) : (
                             <h3 className="font-display text-base font-bold text-foreground">{trail.title}</h3>
@@ -227,6 +212,7 @@ const TrailsPage = () => {
                                     <button
                                       onClick={() => reorderSteps(trail.id, si, si - 1)}
                                       className="p-0.5 rounded text-muted-foreground hover:text-foreground"
+                                      aria-label="Move step up"
                                     >
                                       <ChevronUp className="h-3 w-3" />
                                     </button>
@@ -235,6 +221,7 @@ const TrailsPage = () => {
                                     <button
                                       onClick={() => reorderSteps(trail.id, si, si + 1)}
                                       className="p-0.5 rounded text-muted-foreground hover:text-foreground"
+                                      aria-label="Move step down"
                                     >
                                       <ChevronDown className="h-3 w-3" />
                                     </button>
@@ -242,6 +229,7 @@ const TrailsPage = () => {
                                   <button
                                     onClick={() => removeStep(trail.id, step.id)}
                                     className="p-0.5 rounded text-muted-foreground hover:text-destructive"
+                                    aria-label="Remove step"
                                   >
                                     <X className="h-3 w-3" />
                                   </button>
