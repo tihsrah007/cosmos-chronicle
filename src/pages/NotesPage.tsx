@@ -72,6 +72,7 @@ const NotesPage = () => {
 
       <main className="pt-24 pb-16">
         <div className="container max-w-3xl">
+          <PageTip pageKey="notes" tip="Jot down observations as you explore. Pin important notes to keep them at the top, and use search to find them later." />
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <BackButton />
             <PageHeader

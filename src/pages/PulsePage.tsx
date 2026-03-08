@@ -145,6 +145,7 @@ const PulsePage = () => {
 
       <main className="pt-24 pb-16">
         <div className="container max-w-5xl">
+          <PageTip pageKey="pulse" tip="Pulse surfaces trending updates across all domains. Save items to your Study Board or open them directly on the map." />
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}

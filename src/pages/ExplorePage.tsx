@@ -105,6 +105,7 @@ const ExplorePage = () => {
       <Navbar />
 
       {/* Hero */}
+      <PageTip pageKey="explore" tip="Search and filter across all domains. Click any item to view details, or add it to your Study Board for later." />
       <section className="pt-24 pb-8 px-4">
         <div className="container max-w-6xl mx-auto text-center">
           <motion.h1

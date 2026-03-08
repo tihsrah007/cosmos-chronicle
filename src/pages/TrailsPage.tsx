@@ -77,6 +77,7 @@ const TrailsPage = () => {
 
       <main className="pt-24 pb-16">
         <div className="container max-w-3xl">
+          <PageTip pageKey="trails" tip="Build research trails by linking discoveries together. Add steps from maps, topics, pulse, or notes using the 'Add to Trail' button." />
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <BackButton />
             <PageHeader
