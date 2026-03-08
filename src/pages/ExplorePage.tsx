@@ -30,6 +30,7 @@ interface ExploreItem {
 }
 
 const ExplorePage = () => {
+  const studyBoard = useStudyBoard();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeDomains, setActiveDomains] = useState<Set<string>>(new Set(DOMAINS.map(d => d.slug)));
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
