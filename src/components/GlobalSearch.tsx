@@ -208,23 +208,52 @@ const GlobalSearch = ({ open, onClose }: GlobalSearchProps) => {
                           flatIdx++;
                           const idx = flatIdx;
                           return (
-                            <button
+                            <div
                               key={`${item.name}-${i}`}
                               data-idx={idx}
-                              onClick={() => handleSelect(item)}
                               onMouseEnter={() => setActiveIdx(idx)}
-                              className={`w-full text-left px-5 py-3 transition-colors border-b border-border/50 last:border-b-0 ${
+                              className={`flex items-center px-5 py-3 transition-colors border-b border-border/50 last:border-b-0 ${
                                 activeIdx === idx ? "bg-secondary/70" : "hover:bg-secondary/50"
                               }`}
                             >
-                              <div className="flex items-center gap-2 mb-0.5">
-                                <p className="font-display text-sm font-semibold text-foreground">{item.name}</p>
-                                <span className="px-1.5 py-0.5 rounded text-[10px] font-body font-medium bg-secondary text-muted-foreground">
-                                  {item.category}
-                                </span>
-                              </div>
-                              <p className="font-body text-xs text-muted-foreground line-clamp-1">{item.description}</p>
-                            </button>
+                              <button
+                                onClick={() => handleSelect(item)}
+                                className="flex-1 text-left min-w-0"
+                              >
+                                <div className="flex items-center gap-2 mb-0.5">
+                                  <p className="font-display text-sm font-semibold text-foreground">{item.name}</p>
+                                  <span className="px-1.5 py-0.5 rounded text-[10px] font-body font-medium bg-secondary text-muted-foreground">
+                                    {item.category}
+                                  </span>
+                                </div>
+                                <p className="font-body text-xs text-muted-foreground line-clamp-1">{item.description}</p>
+                              </button>
+                              {(() => {
+                                const boardId = makeStudyBoardId(domain, item.name);
+                                const onBoard = studyBoard.hasItem(boardId);
+                                return (
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      studyBoard.addItem({
+                                        name: item.name,
+                                        domain,
+                                        category: item.category,
+                                        description: item.description,
+                                        coordinates: item.coordinates,
+                                      });
+                                    }}
+                                    disabled={onBoard}
+                                    className={`shrink-0 ml-3 p-1.5 rounded-md transition-colors ${
+                                      onBoard ? "text-primary" : "text-muted-foreground hover:text-primary hover:bg-secondary"
+                                    }`}
+                                    title={onBoard ? "On Study Board" : "Add to Study Board"}
+                                  >
+                                    {onBoard ? <Check className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
+                                  </button>
+                                );
+                              })()}
+                            </div>
                           );
                         })}
                       </div>
