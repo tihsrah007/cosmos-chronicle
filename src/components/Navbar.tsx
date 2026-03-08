@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Compass, Menu, X, Search } from "lucide-react";
+import { Compass, Menu, X, Search, StickyNote } from "lucide-react";
 import { Link } from "react-router-dom";
 import GlobalSearch from "./GlobalSearch";
+import { useNotes } from "@/stores/notes";
 
 const navItems = [
   { label: "History", href: "/history" },
@@ -11,7 +12,7 @@ const navItems = [
   { label: "Cosmology", href: "/cosmology" },
   { label: "Universe", href: "/universe" },
   { label: "Explore", href: "/explore" },
-  { label: "Topics", href: "/topics/plate-tectonics" },
+  { label: "Topics", href: "/topics" },
   { label: "Study Board", href: "/study-board" },
   { label: "Pulse", href: "/pulse" },
 ];
@@ -19,6 +20,7 @@ const navItems = [
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const { notes } = useNotes();
 
   // ⌘K / Ctrl+K shortcut
   useEffect(() => {
@@ -47,7 +49,7 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-6">
             {navItems.map((item) => (
               <Link
                 key={item.label}
@@ -57,9 +59,24 @@ const Navbar = () => {
                 {item.label}
               </Link>
             ))}
+            {/* Notes with badge */}
+            <Link
+              to="/notes"
+              className="relative font-body text-sm tracking-wide text-muted-foreground transition-colors hover:text-primary flex items-center gap-1"
+              aria-label={`Notes (${notes.length})`}
+            >
+              <StickyNote className="h-3.5 w-3.5" />
+              <span>Notes</span>
+              {notes.length > 0 && (
+                <span className="absolute -top-1.5 -right-2.5 min-w-[16px] h-4 flex items-center justify-center px-1 rounded-full bg-primary text-primary-foreground font-body text-[9px] font-bold">
+                  {notes.length}
+                </span>
+              )}
+            </Link>
             <button
               onClick={() => setSearchOpen(true)}
               className="flex items-center gap-2 rounded-lg bg-secondary border border-border px-3 py-1.5 font-body text-sm text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all"
+              aria-label="Search (Cmd+K)"
             >
               <Search className="h-3.5 w-3.5" />
               <span>Search</span>
@@ -69,10 +86,18 @@ const Navbar = () => {
 
           {/* Mobile toggle */}
           <div className="flex items-center gap-2 md:hidden">
-            <button onClick={() => setSearchOpen(true)} className="p-2 text-muted-foreground hover:text-foreground">
+            <Link to="/notes" className="relative p-2 text-muted-foreground hover:text-foreground" aria-label="Notes">
+              <StickyNote className="h-5 w-5" />
+              {notes.length > 0 && (
+                <span className="absolute top-0.5 right-0.5 min-w-[14px] h-3.5 flex items-center justify-center px-0.5 rounded-full bg-primary text-primary-foreground text-[8px] font-bold">
+                  {notes.length}
+                </span>
+              )}
+            </Link>
+            <button onClick={() => setSearchOpen(true)} className="p-2 text-muted-foreground hover:text-foreground" aria-label="Search">
               <Search className="h-5 w-5" />
             </button>
-            <button onClick={() => setOpen(!open)} className="text-foreground">
+            <button onClick={() => setOpen(!open)} className="text-foreground" aria-label={open ? "Close menu" : "Open menu"}>
               {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
@@ -96,6 +121,18 @@ const Navbar = () => {
                   {item.label}
                 </Link>
               ))}
+              <Link
+                to="/notes"
+                onClick={() => setOpen(false)}
+                className="font-body text-base text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
+              >
+                Notes
+                {notes.length > 0 && (
+                  <span className="px-1.5 py-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+                    {notes.length}
+                  </span>
+                )}
+              </Link>
             </div>
           </motion.div>
         )}

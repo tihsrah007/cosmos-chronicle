@@ -13,13 +13,21 @@ import CosmologyMap from "./pages/CosmologyMap";
 import ExplorePage from "./pages/ExplorePage";
 import StudyBoardPage from "./pages/StudyBoardPage";
 import PulsePage from "./pages/PulsePage";
-import TopicHubPage from "./pages/TopicHubPage";
-import ComparePage from "./pages/ComparePage";
 import NotFound from "./pages/NotFound";
 
 const UniverseMap = lazy(() => import("./pages/UniverseMap"));
+const TopicHubPage = lazy(() => import("./pages/TopicHubPage"));
+const TopicsIndexPage = lazy(() => import("./pages/TopicsIndexPage"));
+const ComparePage = lazy(() => import("./pages/ComparePage"));
+const NotesPage = lazy(() => import("./pages/NotesPage"));
 
 const queryClient = new QueryClient();
+
+const LazyFallback = () => (
+  <div className="fixed inset-0 bg-background flex items-center justify-center">
+    <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+  </div>
+);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -37,9 +45,11 @@ const App = () => (
             <Route path="/explore" element={<ExplorePage />} />
             <Route path="/study-board" element={<StudyBoardPage />} />
             <Route path="/pulse" element={<PulsePage />} />
-            <Route path="/topics/:slug" element={<TopicHubPage />} />
-            <Route path="/compare" element={<ComparePage />} />
-            <Route path="/universe" element={<Suspense fallback={<div className="fixed inset-0 bg-background flex items-center justify-center"><div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>}><UniverseMap /></Suspense>} />
+            <Route path="/topics" element={<Suspense fallback={<LazyFallback />}><TopicsIndexPage /></Suspense>} />
+            <Route path="/topics/:slug" element={<Suspense fallback={<LazyFallback />}><TopicHubPage /></Suspense>} />
+            <Route path="/compare" element={<Suspense fallback={<LazyFallback />}><ComparePage /></Suspense>} />
+            <Route path="/notes" element={<Suspense fallback={<LazyFallback />}><NotesPage /></Suspense>} />
+            <Route path="/universe" element={<Suspense fallback={<LazyFallback />}><UniverseMap /></Suspense>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
