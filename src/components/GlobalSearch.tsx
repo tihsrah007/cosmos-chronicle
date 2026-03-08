@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, X, Globe, Mountain, Landmark, Telescope, MapPin, AlertCircle, Plus, Check } from "lucide-react";
+import { Search, X, Globe, Mountain, Landmark, Telescope, MapPin, AlertCircle, Plus, Check, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useGlobalSearch } from "@/hooks/use-search";
 import { useStudyBoard, makeStudyBoardId } from "@/stores/study-board";
+import { loadRecent, type RecentItem } from "@/stores/recent";
 
 const domainIcons: Record<string, typeof Globe> = {
   geopolitics: Globe,
