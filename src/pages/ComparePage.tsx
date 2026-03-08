@@ -16,8 +16,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useStudyBoard, type StudyBoardItem } from "@/stores/study-board";
 import NotesSection from "@/components/NotesSection";
-
-const COMPARE_KEY = "terranova_compare";
+import { loadCompare, saveCompare, clearCompare } from "@/stores/compare";
 
 const domainColors: Record<string, string> = {
   history: "hsl(38, 90%, 55%)",
@@ -34,18 +33,11 @@ const domainRoutes: Record<string, string> = {
 };
 
 function loadPersistedCompare(): { itemA?: string; itemB?: string } {
-  try {
-    const raw = sessionStorage.getItem(COMPARE_KEY);
-    return raw ? JSON.parse(raw) : {};
-  } catch {
-    return {};
-  }
+  return loadCompare();
 }
 
 function persistCompare(state: { itemA?: string; itemB?: string }) {
-  try {
-    sessionStorage.setItem(COMPARE_KEY, JSON.stringify(state));
-  } catch {}
+  saveCompare(state);
 }
 
 const ComparePage = () => {
@@ -77,7 +69,7 @@ const ComparePage = () => {
 
   const handleClear = () => {
     setSelection({});
-    sessionStorage.removeItem(COMPARE_KEY);
+    clearCompare();
   };
 
   const selectItem = (id: string, side: "A" | "B") => {
