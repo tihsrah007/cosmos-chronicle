@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import TimelineSlider from "@/components/TimelineSlider";
+import TimelinePlayer from "@/components/TimelinePlayer";
 import DetailPanel from "@/components/DetailPanel";
 import MapLoadingState from "@/components/MapLoadingState";
 import MapErrorState from "@/components/MapErrorState";
@@ -433,6 +434,36 @@ const HistoryMap = () => {
             Zoom: {position.zoom.toFixed(1)}x
           </span>
         </div>
+
+        {/* Timeline Player */}
+        {showTimeline && (
+          <TimelinePlayer
+            pois={filteredEvents.map(e => ({
+              name: e.name,
+              coordinates: e.coordinates,
+              description: e.description,
+              category: e.category,
+              details: e.details,
+              facts: e.facts,
+              keyFigures: e.keyFigures,
+              relatedItems: e.relatedItems,
+              sources: e.sources,
+              year: e.year,
+              startYear: e.year,
+              endYear: e.year,
+            }))}
+            currentYear={currentYear}
+            onYearChange={setCurrentYear}
+            minYear={-5000}
+            maxYear={2025}
+            accentColor="hsl(38, 85%, 55%)"
+            formatYear={formatYear}
+            onSelectPOI={(poi) => {
+              const match = allEvents.find(e => e.name === poi.name);
+              if (match) handleEventClick(match);
+            }}
+          />
+        )}
 
         {/* Info Panel */}
         <AnimatePresence>

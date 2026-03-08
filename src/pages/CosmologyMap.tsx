@@ -112,6 +112,9 @@ const CosmologyMap = () => {
         keyFigures: item.keyFigures,
         relatedItems: item.relatedItems,
         sources: item.sources,
+        year: item.year,
+        startYear: item.startYear,
+        endYear: item.endYear,
       }))
     : STATIC_COSMOLOGY_POIS;
 

@@ -21,6 +21,7 @@ import {
 import { useNavigate, useLocation } from "react-router-dom";
 import TimelineSlider from "./TimelineSlider";
 import DetailPanel from "./DetailPanel";
+import TimelinePlayer from "./TimelinePlayer";
 
 const GEO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
@@ -34,6 +35,9 @@ export interface MapPOI {
   keyFigures?: { label: string; value: string }[];
   relatedItems?: string[];
   sources?: { label: string; url?: string }[];
+  year?: number;
+  startYear?: number;
+  endYear?: number;
 }
 
 interface TimelineConfig {
@@ -494,6 +498,20 @@ const FullPageMap = ({
             </button>
           ))}
         </div>
+
+        {/* Timeline Player */}
+        {timeline && showTimeline && (
+          <TimelinePlayer
+            pois={filteredPOIs}
+            currentYear={currentYear}
+            onYearChange={setCurrentYear}
+            minYear={timeline.minYear}
+            maxYear={timeline.maxYear}
+            accentColor={timeline.accentColor}
+            formatYear={timeline.formatYear}
+            onSelectPOI={handleMarkerClick}
+          />
+        )}
 
         {/* Stats */}
         <div className="absolute bottom-6 left-6 z-20 flex items-center gap-3">
