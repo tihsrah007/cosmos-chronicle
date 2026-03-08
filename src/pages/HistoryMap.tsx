@@ -18,8 +18,9 @@ import {
   MapPin,
   Clock,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import TimelineSlider from "@/components/TimelineSlider";
+import DetailPanel from "@/components/DetailPanel";
 import MapLoadingState from "@/components/MapLoadingState";
 import MapErrorState from "@/components/MapErrorState";
 import { useDomainItems } from "@/hooks/use-domain-items";
