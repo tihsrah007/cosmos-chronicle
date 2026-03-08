@@ -11,6 +11,7 @@ import GeologyMap from "./pages/GeologyMap";
 import HistoryMap from "./pages/HistoryMap";
 import CosmologyMap from "./pages/CosmologyMap";
 import ExplorePage from "./pages/ExplorePage";
+import StudyBoardPage from "./pages/StudyBoardPage";
 import NotFound from "./pages/NotFound";
 
 const UniverseMap = lazy(() => import("./pages/UniverseMap"));
