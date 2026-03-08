@@ -50,26 +50,25 @@ const TimelineSlider = ({
       return;
     }
     let lastTime = performance.now();
-    const speed = range / 30; // traverse full range in 30 seconds
+    let localYear = currentYear;
+    const speed = range / 30;
     const tick = (now: number) => {
       const dt = (now - lastTime) / 1000;
       lastTime = now;
-      onYearChange((prev) => {
-        const next = typeof prev === "number" ? prev : currentYear;
-        const newYear = next + speed * dt;
-        if (newYear >= maxYear) {
-          setIsPlaying(false);
-          return maxYear;
-        }
-        return Math.round(newYear);
-      });
+      localYear = localYear + speed * dt;
+      if (localYear >= maxYear) {
+        setIsPlaying(false);
+        onYearChange(maxYear);
+        return;
+      }
+      onYearChange(Math.round(localYear));
       animRef.current = requestAnimationFrame(tick);
     };
     animRef.current = requestAnimationFrame(tick);
     return () => {
       if (animRef.current) cancelAnimationFrame(animRef.current);
     };
-  }, [isPlaying, range, maxYear]);
+  }, [isPlaying]);
 
   const handleTrackClick = useCallback(
     (e: React.MouseEvent) => {
