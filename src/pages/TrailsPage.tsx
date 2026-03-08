@@ -19,6 +19,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useTrails, type ResearchTrail } from "@/stores/trails";
 import { BackButton, PageHeader, EmptyState } from "@/components/ui/shared";
+import PageTip from "@/components/PageTip";
 
 const stepTypeIcons: Record<string, typeof MapPin> = {
   topic: Lightbulb,

@@ -22,6 +22,7 @@ import Footer from "@/components/Footer";
 import { useStudyBoard, type StudyBoardItem } from "@/stores/study-board";
 import { usePulse } from "@/hooks/use-pulse";
 import NotesSection from "@/components/NotesSection";
+import PageTip from "@/components/PageTip";
 
 const domainMeta: Record<string, { icon: typeof Globe; color: string; route: string; label: string }> = {
   history: { icon: Landmark, color: "hsl(38, 90%, 55%)", route: "/history", label: "History" },
