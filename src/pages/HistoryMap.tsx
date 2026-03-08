@@ -19,7 +19,7 @@ import {
   Clock,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import TimelineSlider from "./TimelineSlider";
+import TimelineSlider from "@/components/TimelineSlider";
 import { HISTORY_EVENTS, HISTORY_ERAS, type HistoryEvent } from "@/data/historyData";
 
 const GEO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
