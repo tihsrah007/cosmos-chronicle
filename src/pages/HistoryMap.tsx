@@ -65,6 +65,7 @@ function apiItemToHistoryEvent(item: ApiMapItem): HistoryEvent {
 
 const HistoryMap = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const itemsQuery = useDomainItems("history");
   const timelineQuery = useDomainTimeline("history");
 
