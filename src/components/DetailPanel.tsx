@@ -77,6 +77,7 @@ const DetailPanel = ({ item, accentColor, domainSlug, onClose, onSelectRelated }
         >
           {isOnBoard ? <><Check className="h-3 w-3" /> On Board</> : <><Plus className="h-3 w-3" /> Study Board</>}
         </button>
+      </div>
 
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto px-5 pb-5">
