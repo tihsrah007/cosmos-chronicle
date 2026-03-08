@@ -69,7 +69,7 @@ const ComparePage = () => {
 
   const handleClear = () => {
     setSelection({});
-    sessionStorage.removeItem(COMPARE_KEY);
+    clearCompare();
   };
 
   const selectItem = (id: string, side: "A" | "B") => {
