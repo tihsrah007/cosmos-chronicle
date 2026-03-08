@@ -29,6 +29,10 @@ export interface MapPOI {
   description: string;
   category: string;
   details?: string;
+  facts?: string[];
+  keyFigures?: { label: string; value: string }[];
+  relatedItems?: string[];
+  sources?: { label: string; url?: string }[];
 }
 
 interface TimelineConfig {
