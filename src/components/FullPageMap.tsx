@@ -34,6 +34,9 @@ export interface MapPOI {
   keyFigures?: { label: string; value: string }[];
   relatedItems?: string[];
   sources?: { label: string; url?: string }[];
+  year?: number;
+  startYear?: number;
+  endYear?: number;
 }
 
 interface TimelineConfig {
