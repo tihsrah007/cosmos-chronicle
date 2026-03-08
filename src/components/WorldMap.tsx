@@ -7,7 +7,8 @@ import {
   Marker,
 } from "react-simple-maps";
 import { motion, AnimatePresence } from "framer-motion";
-import { Globe, Mountain, Landmark, X, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
+import { Globe, Mountain, Landmark, X, ZoomIn, ZoomOut, RotateCcw, ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const GEO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
