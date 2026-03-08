@@ -26,6 +26,8 @@ const App = () => (
           <Route path="/geology" element={<GeologyMap />} />
           <Route path="/history" element={<HistoryMap />} />
           <Route path="/cosmology" element={<CosmologyMap />} />
+          <Route path="/explore" element={<ExplorePage />} />
+          <Route path="/universe" element={<UniverseMap />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
