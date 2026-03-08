@@ -13,9 +13,12 @@ import {
   AlertCircle,
   Inbox,
   Sparkles,
+  Plus,
+  Check,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { usePulse, getLastVisit, markVisit } from "@/hooks/use-pulse";
+import { useStudyBoard } from "@/stores/study-board";
 import type { PulseDomain, PulseSourceType, PulseUpdate } from "@/api/pulse-types";
 
 /* ── helpers ── */
