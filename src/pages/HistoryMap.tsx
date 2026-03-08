@@ -437,46 +437,21 @@ const HistoryMap = () => {
         {/* Info Panel */}
         <AnimatePresence>
           {selected && (
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="absolute top-4 left-4 z-30 max-w-sm w-full rounded-xl border border-border bg-card/95 backdrop-blur-xl p-6 shadow-lg"
-            >
-              <button
-                onClick={() => setSelected(null)}
-                className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <X className="h-4 w-4" />
-              </button>
-              <div className="flex items-center gap-2 mb-3">
-                <span
-                  className="inline-block px-2.5 py-0.5 rounded-md text-xs font-body font-semibold"
-                  style={{
-                    backgroundColor: `${getColor(selected.category)}20`,
-                    color: getColor(selected.category),
-                  }}
-                >
-                  {selected.category}
-                </span>
-                <span className="text-xs font-body text-muted-foreground">
-                  {selected.yearLabel}
-                </span>
-              </div>
-              <h3 className="font-display text-xl font-bold text-foreground mb-2">
-                {selected.name}
-              </h3>
-              <p className="font-body text-sm text-muted-foreground leading-relaxed mb-3">
-                {selected.description}
-              </p>
-              {selected.details && (
-                <div className="pt-3 border-t border-border">
-                  <p className="font-body text-xs text-muted-foreground leading-relaxed">
-                    {selected.details}
-                  </p>
-                </div>
-              )}
-            </motion.div>
+            <DetailPanel
+              item={{
+                name: selected.name,
+                coordinates: selected.coordinates,
+                description: selected.description,
+                category: selected.category,
+                details: selected.details,
+                facts: selected.facts,
+                keyFigures: selected.keyFigures,
+                relatedItems: selected.relatedItems,
+                sources: selected.sources,
+              }}
+              accentColor={getColor(selected.category)}
+              onClose={() => setSelected(null)}
+            />
           )}
         </AnimatePresence>
 
