@@ -19,6 +19,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useTrails, type ResearchTrail } from "@/stores/trails";
 import { BackButton, PageHeader, EmptyState } from "@/components/ui/shared";
+import PageTip from "@/components/PageTip";
 
 const stepTypeIcons: Record<string, typeof MapPin> = {
   topic: Lightbulb,
@@ -76,6 +77,7 @@ const TrailsPage = () => {
 
       <main className="pt-24 pb-16">
         <div className="container max-w-3xl">
+          <PageTip pageKey="trails" tip="Build research trails by linking discoveries together. Add steps from maps, topics, pulse, or notes using the 'Add to Trail' button." />
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <BackButton />
             <PageHeader

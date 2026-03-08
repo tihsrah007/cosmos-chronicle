@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useDomainItems } from "@/hooks/use-domain-items";
 import { useStudyBoard, makeStudyBoardId } from "@/stores/study-board";
+import PageTip from "@/components/PageTip";
 
 const DOMAINS = [
   { slug: "history", label: "History", icon: Landmark, route: "/history", color: "hsl(38, 90%, 55%)" },
@@ -104,6 +105,7 @@ const ExplorePage = () => {
       <Navbar />
 
       {/* Hero */}
+      <PageTip pageKey="explore" tip="Search and filter across all domains. Click any item to view details, or add it to your Study Board for later." />
       <section className="pt-24 pb-8 px-4">
         <div className="container max-w-6xl mx-auto text-center">
           <motion.h1

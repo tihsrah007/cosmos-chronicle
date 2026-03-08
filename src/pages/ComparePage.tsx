@@ -19,6 +19,7 @@ import AddToTrailButton from "@/components/AddToTrailButton";
 import SourceList from "@/components/SourceList";
 import { loadCompare, saveCompare, clearCompare } from "@/stores/compare";
 import { BackButton, PageHeader, DomainBadge, EmptyState } from "@/components/ui/shared";
+import PageTip from "@/components/PageTip";
 
 const domainColors: Record<string, string> = {
   history: "hsl(38, 90%, 55%)",
@@ -178,6 +179,7 @@ const ComparePage = () => {
 
       <main className="pt-24 pb-16">
         <div className="container max-w-5xl">
+          <PageTip pageKey="compare" tip="Pick two items from your Study Board to compare side by side. Use Swap to flip columns, or Print for a study sheet." />
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <BackButton />
 

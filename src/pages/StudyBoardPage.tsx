@@ -22,6 +22,7 @@ import Footer from "@/components/Footer";
 import { useStudyBoard, type StudyBoardItem } from "@/stores/study-board";
 import { usePulse } from "@/hooks/use-pulse";
 import NotesSection from "@/components/NotesSection";
+import PageTip from "@/components/PageTip";
 
 const domainMeta: Record<string, { icon: typeof Globe; color: string; route: string; label: string }> = {
   history: { icon: Landmark, color: "hsl(38, 90%, 55%)", route: "/history", label: "History" },
@@ -84,6 +85,7 @@ const StudyBoardPage = () => {
       <Navbar />
 
       {/* Hero */}
+      <PageTip pageKey="study-board" tip="Your Study Board collects items from any map. Expand cards for details, compare two items, or open them back on the map." />
       <section className="pt-24 pb-6 px-4">
         <div className="container max-w-5xl mx-auto">
           <motion.div
