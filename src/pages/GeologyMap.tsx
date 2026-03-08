@@ -35,6 +35,9 @@ const GeologyMap = () => {
         keyFigures: item.keyFigures,
         relatedItems: item.relatedItems,
         sources: item.sources,
+        year: item.year,
+        startYear: item.startYear,
+        endYear: item.endYear,
       }))
     : GEOLOGY_POIS;
 

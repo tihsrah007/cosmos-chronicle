@@ -37,6 +37,9 @@ const GeopoliticsMap = () => {
         keyFigures: item.keyFigures,
         relatedItems: item.relatedItems,
         sources: item.sources,
+        year: item.year,
+        startYear: item.startYear,
+        endYear: item.endYear,
       }))
     : GEOPOLITICS_POIS;
 
