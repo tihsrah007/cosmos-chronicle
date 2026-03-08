@@ -207,6 +207,18 @@ const FullPageMap = ({
           >
             <Filter className="h-4 w-4" />
           </button>
+          {timeline && (
+            <button
+              onClick={() => setShowTimeline(!showTimeline)}
+              className={`p-2 rounded-lg border border-border transition-colors ${
+                showTimeline
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-secondary text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Clock className="h-4 w-4" />
+            </button>
+          )}
           <button
             onClick={() => setShowList(!showList)}
             className={`p-2 rounded-lg border border-border transition-colors ${
