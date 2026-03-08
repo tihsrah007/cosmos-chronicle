@@ -20,7 +20,18 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import TimelineSlider from "@/components/TimelineSlider";
-import { HISTORY_EVENTS, HISTORY_ERAS, type HistoryEvent } from "@/data/historyData";
+import MapLoadingState from "@/components/MapLoadingState";
+import MapErrorState from "@/components/MapErrorState";
+import { useDomainItems } from "@/hooks/use-domain-items";
+import { useDomainTimeline } from "@/hooks/use-domain-timeline";
+// Static fallbacks
+import {
+  HISTORY_EVENTS,
+  HISTORY_ERAS,
+  HISTORY_CATEGORIES as STATIC_CATEGORIES,
+  type HistoryEvent,
+} from "@/data/historyData";
+import type { ApiMapItem } from "@/api/types";
 
 const GEO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
@@ -35,8 +46,23 @@ const categoryColors: Record<string, string> = {
   "Migration & Settlement": "hsl(120, 50%, 45%)",
 };
 
+function apiItemToHistoryEvent(item: ApiMapItem): HistoryEvent {
+  return {
+    name: item.name,
+    coordinates: item.coordinates,
+    description: item.description,
+    category: item.category,
+    year: item.year ?? 0,
+    yearLabel: item.yearLabel ?? String(item.year ?? 0),
+    details: item.details,
+  };
+}
+
 const HistoryMap = () => {
   const navigate = useNavigate();
+  const itemsQuery = useDomainItems("history");
+  const timelineQuery = useDomainTimeline("history");
+
   const [selected, setSelected] = useState<HistoryEvent | null>(null);
   const [hoveredEvent, setHoveredEvent] = useState<HistoryEvent | null>(null);
   const [position, setPosition] = useState<{
@@ -44,59 +70,68 @@ const HistoryMap = () => {
     zoom: number;
   }>({ coordinates: [20, 15], zoom: 1.8 });
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeCategories, setActiveCategories] = useState<Set<string>>(
-    new Set(HISTORY_ERAS.map(() => "").filter(() => false)) // empty init, fill below
-  );
   const [showFilters, setShowFilters] = useState(false);
   const [showList, setShowList] = useState(false);
   const [currentYear, setCurrentYear] = useState(-3000);
   const [showTimeline, setShowTimeline] = useState(true);
 
-  // Initialize categories
-  const categories = useMemo(() => 
-    [...new Set(HISTORY_EVENTS.map(e => e.category))],
-    []
+  // Use API data or fall back to static
+  const allEvents: HistoryEvent[] = useMemo(() => {
+    if (itemsQuery.data) return itemsQuery.data.map(apiItemToHistoryEvent);
+    return HISTORY_EVENTS;
+  }, [itemsQuery.data]);
+
+  const eras = useMemo(() => {
+    if (timelineQuery.data?.eras) return timelineQuery.data.eras;
+    return [...HISTORY_ERAS];
+  }, [timelineQuery.data]);
+
+  const categories = useMemo(
+    () => [...new Set(allEvents.map((e) => e.category))],
+    [allEvents]
   );
-  
-  // Use state initializer
-  useState(() => {
-    setActiveCategories(new Set(categories));
-  });
 
-  // Filter events visible at current year (show events within ±200 years or all past events)
-  const timeFilteredEvents = useMemo(() => {
-    return HISTORY_EVENTS.filter(e => e.year <= currentYear + 100);
-  }, [currentYear]);
+  const [activeCategories, setActiveCategories] = useState<Set<string>>(new Set());
 
-  const filteredEvents = useMemo(() => {
-    return timeFilteredEvents.filter(
-      (e) =>
-        activeCategories.has(e.category) &&
-        (searchQuery === "" ||
-          e.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          e.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          e.yearLabel.toLowerCase().includes(searchQuery.toLowerCase()))
-    );
-  }, [timeFilteredEvents, activeCategories, searchQuery]);
+  // Sync categories when data arrives
+  useMemo(() => {
+    if (categories.length > 0 && activeCategories.size === 0) {
+      setActiveCategories(new Set(categories));
+    }
+  }, [categories]);
+
+  const timeFilteredEvents = useMemo(
+    () => allEvents.filter((e) => e.year <= currentYear + 100),
+    [allEvents, currentYear]
+  );
+
+  const filteredEvents = useMemo(
+    () =>
+      timeFilteredEvents.filter(
+        (e) =>
+          activeCategories.has(e.category) &&
+          (searchQuery === "" ||
+            e.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            e.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            e.yearLabel.toLowerCase().includes(searchQuery.toLowerCase()))
+      ),
+    [timeFilteredEvents, activeCategories, searchQuery]
+  );
 
   const handleZoomIn = useCallback(() => {
     setPosition((pos) => ({ ...pos, zoom: Math.min(pos.zoom * 1.5, 12) }));
   }, []);
-
   const handleZoomOut = useCallback(() => {
     setPosition((pos) => ({ ...pos, zoom: Math.max(pos.zoom / 1.5, 1) }));
   }, []);
-
   const handleReset = useCallback(() => {
     setPosition({ coordinates: [20, 15], zoom: 1.8 });
     setSelected(null);
   }, []);
-
   const handleEventClick = useCallback((event: HistoryEvent) => {
     setSelected(event);
     setPosition({ coordinates: event.coordinates, zoom: 5 });
   }, []);
-
   const toggleCategory = useCallback((cat: string) => {
     setActiveCategories((prev) => {
       const next = new Set(prev);
@@ -106,12 +141,19 @@ const HistoryMap = () => {
     });
   }, []);
 
-  const getColor = (category: string) => categoryColors[category] || "hsl(38, 85%, 55%)";
+  const getColor = (category: string) =>
+    categoryColors[category] || "hsl(38, 85%, 55%)";
 
-  const formatYear = (year: number) => {
-    if (year < 0) return `${Math.abs(year)} BC`;
-    return `${year} AD`;
-  };
+  const formatYear = (year: number) =>
+    year < 0 ? `${Math.abs(year)} BC` : `${year} AD`;
+
+  // Loading / error states
+  if (itemsQuery.isLoading && !itemsQuery.data) {
+    return <MapLoadingState message="Loading historical data…" />;
+  }
+  if (itemsQuery.isError && !itemsQuery.data) {
+    // Fall through to static data — already handled by allEvents fallback
+  }
 
   return (
     <div className="fixed inset-0 bg-background flex flex-col overflow-hidden">
@@ -186,7 +228,11 @@ const HistoryMap = () => {
                     key={cat}
                     onClick={() => toggleCategory(cat)}
                     className={`px-3 py-1 rounded-full font-body text-xs font-medium transition-all border ${isActive ? "border-transparent text-primary-foreground" : "border-border text-muted-foreground hover:text-foreground bg-secondary/50"}`}
-                    style={isActive ? { backgroundColor: color, borderColor: color } : {}}
+                    style={
+                      isActive
+                        ? { backgroundColor: color, borderColor: color }
+                        : {}
+                    }
                   >
                     {cat}
                     <span className="ml-1.5 opacity-70">
@@ -204,7 +250,10 @@ const HistoryMap = () => {
       <div className="flex-1 relative overflow-hidden">
         <div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px] rounded-full opacity-5 pointer-events-none"
-          style={{ background: "radial-gradient(circle, hsl(38, 85%, 55%), transparent 70%)" }}
+          style={{
+            background:
+              "radial-gradient(circle, hsl(38, 85%, 55%), transparent 70%)",
+          }}
         />
 
         <ComposableMap
@@ -216,7 +265,10 @@ const HistoryMap = () => {
             center={position.coordinates}
             zoom={position.zoom}
             onMoveEnd={({ coordinates, zoom }) =>
-              setPosition({ coordinates: coordinates as [number, number], zoom })
+              setPosition({
+                coordinates: coordinates as [number, number],
+                zoom,
+              })
             }
             maxZoom={12}
             minZoom={1}
@@ -252,15 +304,50 @@ const HistoryMap = () => {
                   onMouseEnter={() => setHoveredEvent(event)}
                   onMouseLeave={() => setHoveredEvent(null)}
                 >
-                  <g style={{ cursor: "pointer", opacity }} transform="translate(-10, -10)">
-                    <circle r={16} cx={10} cy={10} fill="transparent" stroke="none" />
+                  <g
+                    style={{ cursor: "pointer", opacity }}
+                    transform="translate(-10, -10)"
+                  >
+                    <circle
+                      r={16}
+                      cx={10}
+                      cy={10}
+                      fill="transparent"
+                      stroke="none"
+                    />
                     {isRecent && (
-                      <circle r={10} cx={10} cy={10} fill={color} opacity={0.25} stroke="none">
-                        <animate attributeName="r" from="10" to="20" dur="2s" repeatCount="indefinite" />
-                        <animate attributeName="opacity" from="0.25" to="0" dur="2s" repeatCount="indefinite" />
+                      <circle
+                        r={10}
+                        cx={10}
+                        cy={10}
+                        fill={color}
+                        opacity={0.25}
+                        stroke="none"
+                      >
+                        <animate
+                          attributeName="r"
+                          from="10"
+                          to="20"
+                          dur="2s"
+                          repeatCount="indefinite"
+                        />
+                        <animate
+                          attributeName="opacity"
+                          from="0.25"
+                          to="0"
+                          dur="2s"
+                          repeatCount="indefinite"
+                        />
                       </circle>
                     )}
-                    <circle r={6} cx={10} cy={10} fill={color} stroke="hsl(220, 20%, 7%)" strokeWidth={1.5} />
+                    <circle
+                      r={6}
+                      cx={10}
+                      cy={10}
+                      fill={color}
+                      stroke="hsl(220, 20%, 7%)"
+                      strokeWidth={1.5}
+                    />
                   </g>
                 </Marker>
               );
@@ -278,11 +365,22 @@ const HistoryMap = () => {
               className="fixed bottom-32 left-1/2 -translate-x-1/2 z-30 max-w-xs w-full px-4 py-3 rounded-lg bg-card/95 backdrop-blur-xl border border-border shadow-lg pointer-events-none"
             >
               <div className="flex items-center gap-2 mb-1">
-                <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: getColor(hoveredEvent.category) }} />
-                <p className="font-display text-sm font-semibold text-foreground truncate">{hoveredEvent.name}</p>
-                <span className="font-body text-xs text-muted-foreground ml-auto">{hoveredEvent.yearLabel}</span>
+                <span
+                  className="w-2 h-2 rounded-full flex-shrink-0"
+                  style={{
+                    backgroundColor: getColor(hoveredEvent.category),
+                  }}
+                />
+                <p className="font-display text-sm font-semibold text-foreground truncate">
+                  {hoveredEvent.name}
+                </p>
+                <span className="font-body text-xs text-muted-foreground ml-auto">
+                  {hoveredEvent.yearLabel}
+                </span>
               </div>
-              <p className="font-body text-xs text-muted-foreground leading-relaxed line-clamp-2">{hoveredEvent.description}</p>
+              <p className="font-body text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                {hoveredEvent.description}
+              </p>
             </motion.div>
           )}
         </AnimatePresence>
@@ -333,17 +431,28 @@ const HistoryMap = () => {
               <div className="flex items-center gap-2 mb-3">
                 <span
                   className="inline-block px-2.5 py-0.5 rounded-md text-xs font-body font-semibold"
-                  style={{ backgroundColor: `${getColor(selected.category)}20`, color: getColor(selected.category) }}
+                  style={{
+                    backgroundColor: `${getColor(selected.category)}20`,
+                    color: getColor(selected.category),
+                  }}
                 >
                   {selected.category}
                 </span>
-                <span className="text-xs font-body text-muted-foreground">{selected.yearLabel}</span>
+                <span className="text-xs font-body text-muted-foreground">
+                  {selected.yearLabel}
+                </span>
               </div>
-              <h3 className="font-display text-xl font-bold text-foreground mb-2">{selected.name}</h3>
-              <p className="font-body text-sm text-muted-foreground leading-relaxed mb-3">{selected.description}</p>
+              <h3 className="font-display text-xl font-bold text-foreground mb-2">
+                {selected.name}
+              </h3>
+              <p className="font-body text-sm text-muted-foreground leading-relaxed mb-3">
+                {selected.description}
+              </p>
               {selected.details && (
                 <div className="pt-3 border-t border-border">
-                  <p className="font-body text-xs text-muted-foreground leading-relaxed">{selected.details}</p>
+                  <p className="font-body text-xs text-muted-foreground leading-relaxed">
+                    {selected.details}
+                  </p>
                 </div>
               )}
             </motion.div>
@@ -365,33 +474,46 @@ const HistoryMap = () => {
                 </h3>
               </div>
               <div className="flex-1 overflow-y-auto scrollbar-thin">
-                {categories.filter((cat) => activeCategories.has(cat)).map((cat) => {
-                  const catEvents = filteredEvents.filter((e) => e.category === cat);
-                  if (catEvents.length === 0) return null;
-                  return (
-                    <div key={cat} className="border-b border-border last:border-b-0">
+                {categories
+                  .filter((cat) => activeCategories.has(cat))
+                  .map((cat) => {
+                    const catEvents = filteredEvents.filter(
+                      (e) => e.category === cat
+                    );
+                    if (catEvents.length === 0) return null;
+                    return (
                       <div
-                        className="px-4 py-2 font-body text-xs font-semibold uppercase tracking-wider"
-                        style={{ color: getColor(cat) }}
+                        key={cat}
+                        className="border-b border-border last:border-b-0"
                       >
-                        {cat} ({catEvents.length})
-                      </div>
-                      {catEvents.map((event) => (
-                        <button
-                          key={event.name}
-                          onClick={() => handleEventClick(event)}
-                          className={`w-full text-left px-4 py-2 hover:bg-secondary/50 transition-colors ${selected?.name === event.name ? "bg-secondary/70" : ""}`}
+                        <div
+                          className="px-4 py-2 font-body text-xs font-semibold uppercase tracking-wider"
+                          style={{ color: getColor(cat) }}
                         >
-                          <div className="flex items-center justify-between">
-                            <p className="font-body text-sm text-foreground truncate">{event.name}</p>
-                            <span className="font-body text-[10px] text-muted-foreground ml-2 shrink-0">{event.yearLabel}</span>
-                          </div>
-                          <p className="font-body text-xs text-muted-foreground truncate">{event.description.slice(0, 60)}...</p>
-                        </button>
-                      ))}
-                    </div>
-                  );
-                })}
+                          {cat} ({catEvents.length})
+                        </div>
+                        {catEvents.map((event) => (
+                          <button
+                            key={event.name}
+                            onClick={() => handleEventClick(event)}
+                            className={`w-full text-left px-4 py-2 hover:bg-secondary/50 transition-colors ${selected?.name === event.name ? "bg-secondary/70" : ""}`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <p className="font-body text-sm text-foreground truncate">
+                                {event.name}
+                              </p>
+                              <span className="font-body text-[10px] text-muted-foreground ml-2 shrink-0">
+                                {event.yearLabel}
+                              </span>
+                            </div>
+                            <p className="font-body text-xs text-muted-foreground truncate">
+                              {event.description.slice(0, 60)}...
+                            </p>
+                          </button>
+                        ))}
+                      </div>
+                    );
+                  })}
               </div>
             </motion.div>
           )}
@@ -412,7 +534,7 @@ const HistoryMap = () => {
               maxYear={2025}
               currentYear={currentYear}
               onYearChange={setCurrentYear}
-              eras={HISTORY_ERAS}
+              eras={eras}
               accentColor="hsl(38, 85%, 55%)"
               formatYear={formatYear}
             />
