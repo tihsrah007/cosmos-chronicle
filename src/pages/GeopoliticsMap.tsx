@@ -33,6 +33,10 @@ const GeopoliticsMap = () => {
         description: item.description,
         category: item.category,
         details: item.details,
+        facts: item.facts,
+        keyFigures: item.keyFigures,
+        relatedItems: item.relatedItems,
+        sources: item.sources,
       }))
     : GEOPOLITICS_POIS;
 

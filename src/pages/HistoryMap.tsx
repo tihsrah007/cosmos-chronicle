@@ -55,6 +55,10 @@ function apiItemToHistoryEvent(item: ApiMapItem): HistoryEvent {
     year: item.year ?? 0,
     yearLabel: item.yearLabel ?? String(item.year ?? 0),
     details: item.details,
+    facts: item.facts,
+    keyFigures: item.keyFigures,
+    relatedItems: item.relatedItems,
+    sources: item.sources,
   };
 }
 
