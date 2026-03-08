@@ -70,6 +70,8 @@ const TimelinePlayer = ({
   const animRef = useRef<number | null>(null);
   const lastTimeRef = useRef(0);
   const feedRef = useRef<HTMLDivElement>(null);
+  const yearRef = useRef(currentYear);
+  yearRef.current = currentYear;
 
   const range = maxYear - minYear;
   const activeEvents = useMemo(() => getActiveEvents(pois, currentYear), [pois, currentYear]);
