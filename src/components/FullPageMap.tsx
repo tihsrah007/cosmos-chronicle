@@ -499,6 +499,20 @@ const FullPageMap = ({
           ))}
         </div>
 
+        {/* Timeline Player */}
+        {timeline && showTimeline && (
+          <TimelinePlayer
+            pois={filteredPOIs}
+            currentYear={currentYear}
+            onYearChange={setCurrentYear}
+            minYear={timeline.minYear}
+            maxYear={timeline.maxYear}
+            accentColor={timeline.accentColor}
+            formatYear={timeline.formatYear}
+            onSelectPOI={handleMarkerClick}
+          />
+        )}
+
         {/* Stats */}
         <div className="absolute bottom-6 left-6 z-20 flex items-center gap-3">
           <span className="px-3 py-1.5 rounded-lg bg-card/90 backdrop-blur-sm border border-border font-body text-xs text-muted-foreground">
