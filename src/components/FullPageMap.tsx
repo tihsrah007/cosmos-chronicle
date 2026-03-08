@@ -583,6 +583,30 @@ const FullPageMap = ({
           )}
         </AnimatePresence>
       </div>
+      {/* Timeline Overlay Content */}
+      {timelineOverlay}
+
+      {/* Timeline Bar */}
+      <AnimatePresence>
+        {timeline && showTimeline && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="z-30 border-t border-border bg-card/90 backdrop-blur-xl px-4 md:px-6 py-3"
+          >
+            <TimelineSlider
+              minYear={timeline.minYear}
+              maxYear={timeline.maxYear}
+              currentYear={currentYear}
+              onYearChange={setCurrentYear}
+              eras={timeline.eras}
+              accentColor={timeline.accentColor}
+              formatYear={timeline.formatYear}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
