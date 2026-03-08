@@ -1,7 +1,11 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Globe, Mountain, Landmark, Telescope, MapPin, Filter, ArrowRight } from "lucide-react";
+import { Search, Globe, Mountain, Landmark, Telescope, MapPin, Filter, ArrowRight, Plus, Check } from "lucide-react";
 import { Link } from "react-router-dom";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { useDomainItems } from "@/hooks/use-domain-items";
+import { useStudyBoard, makeStudyBoardId } from "@/stores/study-board";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useDomainItems } from "@/hooks/use-domain-items";
