@@ -1,73 +1,118 @@
-# Welcome to your Lovable project
+# Terranova Atlas
 
-## Project info
+Terranova is an interactive, map-first knowledge atlas for geology, geopolitics, history, and cosmology.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+The product goal is simple: help curious visitors explore facts, figures, events, and context through maps, timelines, and rich detail panels.
 
-## How can I edit this code?
+## Project docs
 
-There are several ways of editing your application.
+- `README.md` (this file): quick start, current capabilities, API overview
+- `PROJECT_PLAN.md`: detailed roadmap and pending work (frontend + backend)
+- `AGENTS.md`: architecture and role-based implementation guide
 
-**Use Lovable**
+## Current capabilities
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+Frontend:
+- Domain map routes: `/geology`, `/geopolitics`, `/history`, `/cosmology`
+- Additional routes: `/explore`, `/study-board`, `/pulse`, `/topics`, `/topics/:slug`, `/compare`, `/notes`, `/universe`
+- Global search with map focus handoff
+- Rich detail panel with facts, key figures, related items, sources, and Wikipedia snapshot
+- Timeline slider and timeline player controls on timeline-enabled maps
+- Map layer controls (category toggles, source-only mode, focus mode)
+- Simple PIN gate before entering the app
+- Study board (local persisted) with compare entrypoints
+- Topic hubs (8 starter hubs) and compare workspace
+- Local notes system (`terranova_notes`)
+- Pulse feed UX with filters, trending tags, and map handoff
 
-Changes made via Lovable will be committed automatically to this repo.
+Backend:
+- Express + TypeScript API in `server/`
+- Local persisted content store in `server/data/content-store.json`
+- Cross-domain search endpoint
+- Wikipedia enrichment endpoint with cache in `server/data/wikipedia-cache.json`
+- CRUD endpoints for domain items, timeline events, and geopolitics country profiles
+- PIN verification endpoints for shared access
 
-**Use your preferred IDE**
+Current backend gap:
+- Pulse page currently uses frontend fallback/mock data when `/api/pulse` is unavailable.
+- A production `GET /api/pulse` pipeline is planned (see `PROJECT_PLAN.md`).
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Tech stack
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- Vite + React + TypeScript
+- Tailwind + shadcn/ui + Framer Motion
+- React Query
+- Express (local API)
+- Vitest + Supertest
 
-Follow these steps:
+## Run locally
+
+Install deps:
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+npm install
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Start frontend:
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```sh
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Start backend (separate terminal):
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```sh
+npm run server:dev
+```
 
-**Use GitHub Codespaces**
+Build checks:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```sh
+npm run build
+npm run test:server
+npm run server:build
+```
 
-## What technologies are used for this project?
+## Environment variables
 
-This project is built with:
+- `PORT` (default: `4000`)
+- `APP_PIN` (default: `0000`)
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## API overview
 
-## How can I deploy this project?
+Base URL: `http://localhost:4000/api`
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+Core:
+- `GET /health`
+- `GET /access/config`
+- `POST /access/pin`
 
-## Can I connect a custom domain to my Lovable project?
+Domain content:
+- `GET /domains`
+- `GET /domains/:slug`
+- `GET /domains/:slug/items`
+- `GET /domains/:slug/timeline`
+- `GET /geopolitics/countries`
+- `GET /search?q=...`
 
-Yes, you can!
+Enrichment:
+- `GET /enrichment/wikipedia?title=...`
+- `POST /enrichment/wikipedia/batch`
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Content management (local CRUD):
+- `POST /domains/:slug/items`
+- `PATCH /domains/:slug/items/:itemId`
+- `DELETE /domains/:slug/items/:itemId`
+- `POST /domains/:slug/timeline/events`
+- `PATCH /domains/:slug/timeline/events/:eventId`
+- `DELETE /domains/:slug/timeline/events/:eventId`
+- `POST /geopolitics/countries`
+- `PATCH /geopolitics/countries/:countryId`
+- `DELETE /geopolitics/countries/:countryId`
+- `POST /admin/reset`
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## Notes
+
+- This repo started as a Lovable-generated frontend and is now being extended with a custom backend.
+- Product direction is exploration-first (no user profiles, no student progress tracking, no classroom role system).
+- For next work sessions, start from `PROJECT_PLAN.md`.

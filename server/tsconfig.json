@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "rootDir": "..",
+    "outDir": "dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "types": ["node", "vitest/globals"]
+  },
+  "include": [
+    "src/**/*.ts",
+    "../src/data/geologyData.ts",
+    "../src/data/geologyTimelineData.ts",
+    "../src/data/geopoliticsData.ts",
+    "../src/data/geopoliticsTimelineData.ts",
+    "../src/data/historyData.ts"
+  ]
+}
