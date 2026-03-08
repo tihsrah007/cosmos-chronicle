@@ -55,7 +55,28 @@ const DetailPanel = ({ item, accentColor, domainSlug, onClose, onSelectRelated }
         <h3 className="font-display text-xl font-bold text-foreground mb-2 pr-6">
           {item.name}
         </h3>
-      </div>
+        {/* Add to Study Board */}
+        <button
+          onClick={() => addItem({
+            name: item.name,
+            domain: domainSlug,
+            category: item.category,
+            description: item.description,
+            details: item.details,
+            facts: item.facts,
+            keyFigures: item.keyFigures,
+            sources: item.sources,
+            coordinates: item.coordinates,
+          })}
+          disabled={isOnBoard}
+          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md font-body text-[11px] font-medium transition-colors ${
+            isOnBoard
+              ? "bg-primary/10 text-primary cursor-default"
+              : "bg-secondary border border-border text-muted-foreground hover:text-foreground hover:border-primary/30"
+          }`}
+        >
+          {isOnBoard ? <><Check className="h-3 w-3" /> On Board</> : <><Plus className="h-3 w-3" /> Study Board</>}
+        </button>
 
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto px-5 pb-5">
