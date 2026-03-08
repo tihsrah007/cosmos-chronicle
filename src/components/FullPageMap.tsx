@@ -16,8 +16,10 @@ import {
   Search,
   Filter,
   MapPin,
+  Clock,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import TimelineSlider from "./TimelineSlider";
 
 const GEO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
