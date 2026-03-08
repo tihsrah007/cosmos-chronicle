@@ -323,34 +323,42 @@ const FullPageMap = ({
                   onMouseEnter={() => setHoveredPOI(poi)}
                   onMouseLeave={() => setHoveredPOI(null)}
                 >
-                  <g style={{ cursor: "pointer" }} transform="translate(-6, -6)">
+                  <g style={{ cursor: "pointer" }} transform="translate(-10, -10)">
+                    {/* Invisible larger hit area */}
                     <circle
-                      r={6}
-                      cx={6}
-                      cy={6}
+                      r={16}
+                      cx={10}
+                      cy={10}
+                      fill="transparent"
+                      stroke="none"
+                    />
+                    <circle
+                      r={10}
+                      cx={10}
+                      cy={10}
                       fill={color}
-                      opacity={0.3}
+                      opacity={0.25}
                       stroke="none"
                     >
                       <animate
                         attributeName="r"
-                        from="6"
-                        to="14"
+                        from="10"
+                        to="20"
                         dur="2s"
                         repeatCount="indefinite"
                       />
                       <animate
                         attributeName="opacity"
-                        from="0.3"
+                        from="0.25"
                         to="0"
                         dur="2s"
                         repeatCount="indefinite"
                       />
                     </circle>
                     <circle
-                      r={4}
-                      cx={6}
-                      cy={6}
+                      r={6}
+                      cx={10}
+                      cy={10}
                       fill={color}
                       stroke="hsl(220, 20%, 7%)"
                       strokeWidth={1.5}
