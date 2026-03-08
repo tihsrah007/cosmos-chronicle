@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Compass, Menu, X, Search, StickyNote, Route, BookOpen } from "lucide-react";
+import { Compass, Menu, X, Search, StickyNote, Route, BookOpen, HelpCircle } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import GlobalSearch from "./GlobalSearch";
 import GlossaryDrawer from "./GlossaryDrawer";
+import HelpSheet from "./HelpSheet";
+import FirstRunTip from "./FirstRunTip";
 import { useNotes } from "@/stores/notes";
 import { useTrails } from "@/stores/trails";
 
@@ -23,14 +26,23 @@ const Navbar = () => {
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [glossaryOpen, setGlossaryOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const { notes } = useNotes();
   const { trails } = useTrails();
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      // Don't fire when typing in inputs/textareas
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || (e.target as HTMLElement)?.isContentEditable) return;
+
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         setSearchOpen((p) => !p);
+      }
+      if (e.key === "?" && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        e.preventDefault();
+        setHelpOpen((p) => !p);
       }
     };
     window.addEventListener("keydown", handler);
@@ -99,6 +111,22 @@ const Navbar = () => {
               <BookOpen className="h-3.5 w-3.5" />
               <span>Glossary</span>
             </button>
+            {/* Help */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => setHelpOpen(true)}
+                  className="font-body text-sm tracking-wide text-muted-foreground transition-colors hover:text-primary flex items-center gap-1"
+                  aria-label="Help & Shortcuts"
+                >
+                  <HelpCircle className="h-3.5 w-3.5" />
+                  <span>Help</span>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="text-xs">
+                Help & Shortcuts <kbd className="ml-1 px-1 py-0.5 rounded bg-muted border border-border text-[10px] font-mono">?</kbd>
+              </TooltipContent>
+            </Tooltip>
             <button
               onClick={() => setSearchOpen(true)}
               className="flex items-center gap-2 rounded-lg bg-secondary border border-border px-3 py-1.5 font-body text-sm text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all"
@@ -112,6 +140,9 @@ const Navbar = () => {
 
           {/* Mobile toggle */}
           <div className="flex items-center gap-2 md:hidden">
+            <button onClick={() => setHelpOpen(true)} className="p-2 text-muted-foreground hover:text-foreground" aria-label="Help & Shortcuts">
+              <HelpCircle className="h-5 w-5" />
+            </button>
             <button onClick={() => setGlossaryOpen(true)} className="p-2 text-muted-foreground hover:text-foreground" aria-label="Glossary">
               <BookOpen className="h-5 w-5" />
             </button>
@@ -189,6 +220,8 @@ const Navbar = () => {
 
       <GlobalSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
       <GlossaryDrawer open={glossaryOpen} onClose={() => setGlossaryOpen(false)} />
+      <HelpSheet open={helpOpen} onClose={() => setHelpOpen(false)} />
+      <FirstRunTip onOpenHelp={() => setHelpOpen(true)} />
     </>
   );
 };
