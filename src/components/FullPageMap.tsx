@@ -272,6 +272,17 @@ const FullPageMap = ({
           >
             <MapPin className="h-4 w-4" />
           </button>
+          <button
+            onClick={() => setShowLayers(!showLayers)}
+            className={`p-2 rounded-lg border border-border transition-colors ${
+              showLayers
+                ? "bg-primary text-primary-foreground"
+                : "bg-secondary text-muted-foreground hover:text-foreground"
+            }`}
+            title="Layers & Legend"
+          >
+            <Layers className="h-4 w-4" />
+          </button>
         </div>
       </header>
 
