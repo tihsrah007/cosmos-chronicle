@@ -21,6 +21,7 @@ import {
 import { useNavigate, useLocation } from "react-router-dom";
 import TimelineSlider from "./TimelineSlider";
 import DetailPanel from "./DetailPanel";
+import TimelinePlayer from "./TimelinePlayer";
 
 const GEO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
