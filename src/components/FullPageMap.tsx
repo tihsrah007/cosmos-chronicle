@@ -1,4 +1,4 @@
-import { useState, useCallback, memo, useMemo, ReactNode } from "react";
+import { useState, useCallback, memo, useMemo, ReactNode, useEffect } from "react";
 import {
   ComposableMap,
   Geographies,
