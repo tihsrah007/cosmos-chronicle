@@ -176,7 +176,7 @@ const Navbar = () => {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="md:hidden border-t border-border bg-background/95 backdrop-blur-xl"
+            className="lg:hidden border-t border-border bg-background/95 backdrop-blur-xl"
           >
             <div className="container flex flex-col gap-4 py-6">
               {navItems.map((item) => (
