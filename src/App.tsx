@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import GeopoliticsMap from "./pages/GeopoliticsMap";
 import GeologyMap from "./pages/GeologyMap";
+import HistoryMap from "./pages/HistoryMap";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,6 +21,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/geopolitics" element={<GeopoliticsMap />} />
           <Route path="/geology" element={<GeologyMap />} />
+          <Route path="/history" element={<HistoryMap />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

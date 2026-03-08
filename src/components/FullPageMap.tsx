@@ -1,4 +1,4 @@
-import { useState, useCallback, memo } from "react";
+import { useState, useCallback, memo, useMemo, ReactNode } from "react";
 import {
   ComposableMap,
   Geographies,
@@ -16,8 +16,10 @@ import {
   Search,
   Filter,
   MapPin,
+  Clock,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import TimelineSlider from "./TimelineSlider";
 
 const GEO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
@@ -27,6 +29,15 @@ export interface MapPOI {
   description: string;
   category: string;
   details?: string;
+}
+
+interface TimelineConfig {
+  minYear: number;
+  maxYear: number;
+  defaultYear: number;
+  eras: readonly { label: string; start: number; end: number }[];
+  accentColor: string;
+  formatYear?: (year: number) => string;
 }
 
 interface FullPageMapProps {
@@ -41,6 +52,8 @@ interface FullPageMapProps {
   accentGradient: string;
   countryDescriptions?: Record<string, string>;
   backLabel?: string;
+  timeline?: TimelineConfig;
+  timelineOverlay?: ReactNode;
 }
 
 const categoryColors: Record<string, string> = {
@@ -82,6 +95,8 @@ const FullPageMap = ({
   accentGradient,
   countryDescriptions,
   backLabel = "Back to Home",
+  timeline,
+  timelineOverlay,
 }: FullPageMapProps) => {
   const navigate = useNavigate();
   const [selected, setSelected] = useState<MapPOI | null>(null);
@@ -97,6 +112,8 @@ const FullPageMap = ({
   const [showFilters, setShowFilters] = useState(false);
   const [showList, setShowList] = useState(false);
   const [hoveredPOI, setHoveredPOI] = useState<MapPOI | null>(null);
+  const [showTimeline, setShowTimeline] = useState(!!timeline);
+  const [currentYear, setCurrentYear] = useState(timeline?.defaultYear ?? 0);
 
   const filteredPOIs = pois.filter(
     (p) =>
@@ -190,6 +207,18 @@ const FullPageMap = ({
           >
             <Filter className="h-4 w-4" />
           </button>
+          {timeline && (
+            <button
+              onClick={() => setShowTimeline(!showTimeline)}
+              className={`p-2 rounded-lg border border-border transition-colors ${
+                showTimeline
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-secondary text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Clock className="h-4 w-4" />
+            </button>
+          )}
           <button
             onClick={() => setShowList(!showList)}
             className={`p-2 rounded-lg border border-border transition-colors ${
@@ -323,34 +352,42 @@ const FullPageMap = ({
                   onMouseEnter={() => setHoveredPOI(poi)}
                   onMouseLeave={() => setHoveredPOI(null)}
                 >
-                  <g style={{ cursor: "pointer" }} transform="translate(-6, -6)">
+                  <g style={{ cursor: "pointer" }} transform="translate(-10, -10)">
+                    {/* Invisible larger hit area */}
                     <circle
-                      r={6}
-                      cx={6}
-                      cy={6}
+                      r={16}
+                      cx={10}
+                      cy={10}
+                      fill="transparent"
+                      stroke="none"
+                    />
+                    <circle
+                      r={10}
+                      cx={10}
+                      cy={10}
                       fill={color}
-                      opacity={0.3}
+                      opacity={0.25}
                       stroke="none"
                     >
                       <animate
                         attributeName="r"
-                        from="6"
-                        to="14"
+                        from="10"
+                        to="20"
                         dur="2s"
                         repeatCount="indefinite"
                       />
                       <animate
                         attributeName="opacity"
-                        from="0.3"
+                        from="0.25"
                         to="0"
                         dur="2s"
                         repeatCount="indefinite"
                       />
                     </circle>
                     <circle
-                      r={4}
-                      cx={6}
-                      cy={6}
+                      r={6}
+                      cx={10}
+                      cy={10}
                       fill={color}
                       stroke="hsl(220, 20%, 7%)"
                       strokeWidth={1.5}
@@ -546,6 +583,30 @@ const FullPageMap = ({
           )}
         </AnimatePresence>
       </div>
+      {/* Timeline Overlay Content */}
+      {timelineOverlay}
+
+      {/* Timeline Bar */}
+      <AnimatePresence>
+        {timeline && showTimeline && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="z-30 border-t border-border bg-card/90 backdrop-blur-xl px-4 md:px-6 py-3"
+          >
+            <TimelineSlider
+              minYear={timeline.minYear}
+              maxYear={timeline.maxYear}
+              currentYear={currentYear}
+              onYearChange={setCurrentYear}
+              eras={timeline.eras}
+              accentColor={timeline.accentColor}
+              formatYear={timeline.formatYear}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

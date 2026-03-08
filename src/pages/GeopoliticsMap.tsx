@@ -4,6 +4,7 @@ import {
   GEOPOLITICS_CATEGORIES,
   COUNTRY_DESCRIPTIONS,
 } from "@/data/geopoliticsData";
+import { GEOPOLITICS_ERAS } from "@/data/geopoliticsTimelineData";
 
 const GeopoliticsMap = () => {
   return (
@@ -19,6 +20,14 @@ const GeopoliticsMap = () => {
       accentGradient="linear-gradient(135deg, hsl(38, 90%, 55%), hsl(28, 85%, 45%))"
       countryDescriptions={COUNTRY_DESCRIPTIONS}
       backLabel="Back to Terranova"
+      timeline={{
+        minYear: -5000,
+        maxYear: 2025,
+        defaultYear: 2025,
+        eras: GEOPOLITICS_ERAS,
+        accentColor: "hsl(38, 90%, 55%)",
+        formatYear: (y) => (y < 0 ? `${Math.abs(y)} BC` : `${y} AD`),
+      }}
     />
   );
 };
