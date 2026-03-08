@@ -14,7 +14,7 @@ The product goal is simple: help curious visitors explore facts, figures, events
 
 Frontend:
 - Domain map routes: `/geology`, `/geopolitics`, `/history`, `/cosmology`
-- Additional routes: `/explore`, `/study-board`, `/pulse`, `/topics`, `/topics/:slug`, `/compare`, `/notes`, `/universe`
+- Additional routes: `/explore`, `/study-board`, `/pulse`, `/topics`, `/topics/:slug`, `/compare`, `/notes`, `/trails`, `/universe`
 - Global search with map focus handoff
 - Rich detail panel with facts, key figures, related items, sources, and Wikipedia snapshot
 - Timeline slider and timeline player controls on timeline-enabled maps
@@ -23,6 +23,10 @@ Frontend:
 - Study board (local persisted) with compare entrypoints
 - Topic hubs (8 starter hubs) and compare workspace
 - Local notes system (`terranova_notes`)
+- Research trails system (`terranova_trails`)
+- Glossary drawer + inline glossary tooltips
+- Source confidence badges + citation copy action
+- Print-friendly study sheet mode on Topic Hub and Compare pages
 - Pulse feed UX with filters, trending tags, and map handoff
 
 Backend:
@@ -36,6 +40,7 @@ Backend:
 Current backend gap:
 - Pulse page currently uses frontend fallback/mock data when `/api/pulse` is unavailable.
 - A production `GET /api/pulse` pipeline is planned (see `PROJECT_PLAN.md`).
+- Topic hubs are currently static frontend data and should be replaced by `/api/topics` contracts.
 
 ## Tech stack
 

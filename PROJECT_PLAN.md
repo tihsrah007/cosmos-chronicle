@@ -9,7 +9,7 @@ Terranova is an exploration-first knowledge atlas.
 In scope:
 - map-first discovery for geology, geopolitics, history, cosmology
 - rich factual context (facts, key figures, sources, related items)
-- lightweight personal tooling (study board, compare, local notes)
+- lightweight personal tooling (study board, compare, local notes, trails)
 - public updates feed (Pulse)
 
 Out of scope:
@@ -28,7 +28,7 @@ Access model:
   - `/`, `/geology`, `/geopolitics`, `/history`, `/cosmology`
   - `/explore`, `/study-board`, `/pulse`
   - `/topics`, `/topics/:slug`
-  - `/compare`, `/notes`
+  - `/compare`, `/notes`, `/trails`
   - `/universe`
 - Global search with map-focus handoff
 - Detail panel with facts, key figures, sources, related, wiki snapshot
@@ -37,8 +37,12 @@ Access model:
 - Study board (`terranova_study_board`)
 - Compare workspace (`terranova_compare`)
 - Local notes (`terranova_notes`)
+- Research trails (`terranova_trails`)
 - Pulse page with filters/trending/new-since-last-visit (`terranova-pulse-last-visit`)
 - Topic hubs from static dataset (`src/data/topicHubs.ts`)
+- Glossary system (`src/data/glossary.ts`, drawer + inline tooltip)
+- Source confidence badges + copy citation controls
+- Study sheet print mode on Topic Hub and Compare
 
 ### Backend shipped
 - Express API in `server/`
@@ -61,6 +65,7 @@ Access model:
 2. Topics are static frontend data.
    - Need backend `/api/topics` and `/api/topics/:slug` for long-term maintainability.
 3. Some UX parity polish remains (e.g., related-chip behavior consistency across all domain detail panels).
+4. Optional final UX item: global Help & Shortcuts sheet (`?` trigger) if not completed.
 
 ## 4) Frontend backlog (if/when Lovable time is available)
 
@@ -68,6 +73,7 @@ Access model:
 1. History detail panel: ensure related chips focus mapped events/items consistently.
 2. Mobile map overlay stacking review (detail panel, layers, timeline player).
 3. Improve compare flow from pulse and map detail with clearer affordances.
+4. Add Help & Shortcuts sheet with quick-actions links and keyboard reference.
 
 ### Priority B - study ergonomics
 1. Add glossary/term popovers for difficult concepts on topic pages.
@@ -126,3 +132,4 @@ When resuming:
 1. Backend: implement `/api/pulse` and connect `usePulse` to real data-first flow.
 2. Backend: add `/api/topics` contract and start replacing static topic data.
 3. Frontend: run one final consistency pass on related-item navigation and mobile overlays.
+4. Frontend (optional): add global Help & Shortcuts overlay if still pending.

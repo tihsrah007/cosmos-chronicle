@@ -17,10 +17,12 @@ This file defines how work is split across agents/contributors so sessions can c
   - `src/pages/TopicHubPage.tsx`
   - `src/pages/ComparePage.tsx`
   - `src/pages/NotesPage.tsx`
+  - `src/pages/TrailsPage.tsx`
 - State stores:
   - `src/stores/study-board.ts`
   - `src/stores/notes.ts`
   - `src/stores/compare.ts`
+  - `src/stores/trails.ts`
 - API contracts and clients:
   - `src/api/types.ts`
   - `src/api/pulse-types.ts`
@@ -113,7 +115,7 @@ Before ending any engineering session:
 2. `npm run test:server`
 3. `npm run server:build`
 4. verify critical routes load: `/`, `/geology`, `/geopolitics`, `/history`, `/cosmology`, `/explore`, `/study-board`, `/pulse`
-   and `/topics`, `/compare`, `/notes`
+   and `/topics`, `/compare`, `/notes`, `/trails`
 
 ## 6) Handoff template for next session
 
@@ -126,7 +128,7 @@ When handing off, provide:
 
 ## 7) Current priority order
 
-1. Stabilize and harden newly added frontend surfaces (Topics, Compare, Notes, Pulse interactions).
+1. Stabilize and harden newly added frontend surfaces (Topics, Compare, Notes, Trails, Pulse interactions).
 2. Replace Pulse mock fallback with real backend `/api/pulse` pipeline.
 3. Add backend topics contract (`/api/topics`, `/api/topics/:slug`) to replace static frontend topic hubs.
 4. Expand public-source ingestion while preserving source attribution quality.
