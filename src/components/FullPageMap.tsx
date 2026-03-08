@@ -552,6 +552,26 @@ const FullPageMap = ({
           </span>
         </div>
 
+        {/* Layers Panel */}
+        <AnimatePresence>
+          {showLayers && !selected && (
+            <MapLayersPanel
+              categories={categories}
+              activeCategories={activeCategories}
+              onToggleCategory={toggleCategory}
+              categoryColors={categoryColors}
+              fallbackColor={markerColor}
+              poiCounts={poiCounts}
+              sourceOnlyMode={sourceOnlyMode}
+              onToggleSourceOnly={() => setSourceOnlyMode((v) => !v)}
+              focusMode={focusMode}
+              onToggleFocusMode={() => setFocusMode((v) => !v)}
+              selectedCategory={selectedCategoryForFocus}
+              onClose={() => setShowLayers(false)}
+            />
+          )}
+        </AnimatePresence>
+
         {/* Info Panel */}
         <AnimatePresence>
           {selected && (
