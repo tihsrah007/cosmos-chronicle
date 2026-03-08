@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, X, Globe, Mountain, Landmark, Telescope, MapPin, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -23,31 +23,49 @@ interface GlobalSearchProps {
   onClose: () => void;
 }
 
+interface FlatResult {
+  domain: string;
+  name: string;
+  description: string;
+  category: string;
+  coordinates?: [number, number];
+  groupIdx: number; // index within flattened list
+}
+
 const GlobalSearch = ({ open, onClose }: GlobalSearchProps) => {
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { data: results, isLoading, isError } = useGlobalSearch(query);
+  const [activeIdx, setActiveIdx] = useState(-1);
+  const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (open) {
       setQuery("");
+      setActiveIdx(-1);
       setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [open]);
 
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    if (open) window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [open, onClose]);
+  // Build flat list for keyboard navigation
+  const grouped = results
+    ? results.reduce<Record<string, typeof results>>((acc, r) => {
+        (acc[r.domain] ??= []).push(r);
+        return acc;
+      }, {})
+    : {};
 
-  const handleSelect = (result: { domain: string; name: string; coordinates?: [number, number] }) => {
+  const flatItems: FlatResult[] = [];
+  Object.entries(grouped).forEach(([domain, items]) => {
+    items.forEach((item) => {
+      flatItems.push({ ...item, domain, groupIdx: flatItems.length });
+    });
+  });
+
+  const handleSelect = useCallback((result: { domain: string; name: string; coordinates?: [number, number] }) => {
     const route = domainRoutes[result.domain];
     if (route) {
-      // Navigate with search state so the map page can auto-focus the item
       navigate(route, {
         state: {
           focusItem: result.name,
@@ -56,14 +74,43 @@ const GlobalSearch = ({ open, onClose }: GlobalSearchProps) => {
       });
     }
     onClose();
-  };
+  }, [navigate, onClose]);
 
-  const grouped = results
-    ? results.reduce<Record<string, typeof results>>((acc, r) => {
-        (acc[r.domain] ??= []).push(r);
-        return acc;
-      }, {})
-    : {};
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setActiveIdx((prev) => (prev < flatItems.length - 1 ? prev + 1 : 0));
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setActiveIdx((prev) => (prev > 0 ? prev - 1 : flatItems.length - 1));
+      } else if (e.key === "Enter" && activeIdx >= 0 && activeIdx < flatItems.length) {
+        e.preventDefault();
+        handleSelect(flatItems[activeIdx]);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [open, onClose, activeIdx, flatItems, handleSelect]);
+
+  // Scroll active item into view
+  useEffect(() => {
+    if (activeIdx < 0 || !listRef.current) return;
+    const el = listRef.current.querySelector(`[data-idx="${activeIdx}"]`);
+    el?.scrollIntoView({ block: "nearest" });
+  }, [activeIdx]);
+
+  // Reset active index when results change
+  useEffect(() => {
+    setActiveIdx(-1);
+  }, [results]);
+
+  let flatIdx = -1;
 
   return (
     <AnimatePresence>
@@ -103,7 +150,7 @@ const GlobalSearch = ({ open, onClose }: GlobalSearchProps) => {
               </div>
 
               {/* Results */}
-              <div className="max-h-[60vh] overflow-y-auto">
+              <div ref={listRef} className="max-h-[60vh] overflow-y-auto">
                 {query.length < 2 ? (
                   <div className="px-5 py-8 text-center">
                     <MapPin className="h-8 w-8 mx-auto text-muted-foreground/30 mb-3" />
@@ -155,21 +202,29 @@ const GlobalSearch = ({ open, onClose }: GlobalSearchProps) => {
                             {items.length} result{items.length !== 1 ? "s" : ""}
                           </span>
                         </div>
-                        {items.map((item, i) => (
-                          <button
-                            key={`${item.name}-${i}`}
-                            onClick={() => handleSelect(item)}
-                            className="w-full text-left px-5 py-3 hover:bg-secondary/50 transition-colors border-b border-border/50 last:border-b-0"
-                          >
-                            <div className="flex items-center gap-2 mb-0.5">
-                              <p className="font-display text-sm font-semibold text-foreground">{item.name}</p>
-                              <span className="px-1.5 py-0.5 rounded text-[10px] font-body font-medium bg-secondary text-muted-foreground">
-                                {item.category}
-                              </span>
-                            </div>
-                            <p className="font-body text-xs text-muted-foreground line-clamp-1">{item.description}</p>
-                          </button>
-                        ))}
+                        {items.map((item, i) => {
+                          flatIdx++;
+                          const idx = flatIdx;
+                          return (
+                            <button
+                              key={`${item.name}-${i}`}
+                              data-idx={idx}
+                              onClick={() => handleSelect(item)}
+                              onMouseEnter={() => setActiveIdx(idx)}
+                              className={`w-full text-left px-5 py-3 transition-colors border-b border-border/50 last:border-b-0 ${
+                                activeIdx === idx ? "bg-secondary/70" : "hover:bg-secondary/50"
+                              }`}
+                            >
+                              <div className="flex items-center gap-2 mb-0.5">
+                                <p className="font-display text-sm font-semibold text-foreground">{item.name}</p>
+                                <span className="px-1.5 py-0.5 rounded text-[10px] font-body font-medium bg-secondary text-muted-foreground">
+                                  {item.category}
+                                </span>
+                              </div>
+                              <p className="font-body text-xs text-muted-foreground line-clamp-1">{item.description}</p>
+                            </button>
+                          );
+                        })}
                       </div>
                     );
                   })
@@ -178,7 +233,7 @@ const GlobalSearch = ({ open, onClose }: GlobalSearchProps) => {
 
               <div className="px-5 py-2.5 border-t border-border bg-secondary/20">
                 <p className="font-body text-[10px] text-muted-foreground/60 text-center">
-                  Press <kbd className="px-1 py-0.5 rounded bg-secondary text-muted-foreground text-[10px]">ESC</kbd> to close · Select an item to navigate to its map
+                  <kbd className="px-1 py-0.5 rounded bg-secondary text-muted-foreground text-[10px]">↑↓</kbd> navigate · <kbd className="px-1 py-0.5 rounded bg-secondary text-muted-foreground text-[10px]">↵</kbd> select · <kbd className="px-1 py-0.5 rounded bg-secondary text-muted-foreground text-[10px]">ESC</kbd> close
                 </p>
               </div>
             </div>

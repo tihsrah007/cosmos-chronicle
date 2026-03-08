@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { X, ChevronDown, ChevronUp, ExternalLink, BarChart3, BookOpen, Link2, Globe } from "lucide-react";
 import type { MapPOI } from "./FullPageMap";
@@ -8,12 +8,19 @@ interface DetailPanelProps {
   item: MapPOI;
   accentColor: string;
   onClose: () => void;
+  onSelectRelated?: (name: string) => void;
 }
 
-const DetailPanel = ({ item, accentColor, onClose }: DetailPanelProps) => {
+const DetailPanel = ({ item, accentColor, onClose, onSelectRelated }: DetailPanelProps) => {
   const [expandedDetails, setExpandedDetails] = useState(false);
   const [showWiki, setShowWiki] = useState(false);
   const { data: wiki, isLoading: wikiLoading } = useWikipediaSnapshot(item.name);
+
+  const handleRelatedClick = useCallback((name: string) => {
+    if (onSelectRelated) {
+      onSelectRelated(name);
+    }
+  }, [onSelectRelated]);
 
   return (
     <motion.div
@@ -123,12 +130,13 @@ const DetailPanel = ({ item, accentColor, onClose }: DetailPanelProps) => {
             </div>
             <div className="flex flex-wrap gap-1.5">
               {item.relatedItems.map((name, i) => (
-                <span
+                <button
                   key={i}
+                  onClick={() => handleRelatedClick(name)}
                   className="px-2.5 py-1 rounded-md bg-secondary border border-border/50 font-body text-xs text-muted-foreground hover:text-foreground hover:border-primary/30 transition-colors cursor-pointer"
                 >
                   {name}
-                </span>
+                </button>
               ))}
             </div>
           </div>
