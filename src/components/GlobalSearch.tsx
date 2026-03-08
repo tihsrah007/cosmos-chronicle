@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, X, Globe, Mountain, Landmark, Telescope, MapPin } from "lucide-react";
+import { Search, X, Globe, Mountain, Landmark, Telescope, MapPin, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useGlobalSearch } from "@/hooks/use-search";
 
@@ -27,7 +27,7 @@ const GlobalSearch = ({ open, onClose }: GlobalSearchProps) => {
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
-  const { data: results, isLoading } = useGlobalSearch(query);
+  const { data: results, isLoading, isError } = useGlobalSearch(query);
 
   useEffect(() => {
     if (open) {
@@ -36,7 +36,6 @@ const GlobalSearch = ({ open, onClose }: GlobalSearchProps) => {
     }
   }, [open]);
 
-  // Close on Escape
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -45,9 +44,17 @@ const GlobalSearch = ({ open, onClose }: GlobalSearchProps) => {
     return () => window.removeEventListener("keydown", handler);
   }, [open, onClose]);
 
-  const handleSelect = (result: { domain: string }) => {
+  const handleSelect = (result: { domain: string; name: string; coordinates?: [number, number] }) => {
     const route = domainRoutes[result.domain];
-    if (route) navigate(route);
+    if (route) {
+      // Navigate with search state so the map page can auto-focus the item
+      navigate(route, {
+        state: {
+          focusItem: result.name,
+          focusCoordinates: result.coordinates,
+        },
+      });
+    }
     onClose();
   };
 
@@ -62,7 +69,6 @@ const GlobalSearch = ({ open, onClose }: GlobalSearchProps) => {
     <AnimatePresence>
       {open && (
         <>
-          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -71,7 +77,6 @@ const GlobalSearch = ({ open, onClose }: GlobalSearchProps) => {
             className="fixed inset-0 z-[100] bg-background/80 backdrop-blur-sm"
           />
 
-          {/* Panel */}
           <motion.div
             initial={{ opacity: 0, y: -20, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -117,6 +122,13 @@ const GlobalSearch = ({ open, onClose }: GlobalSearchProps) => {
                         </button>
                       ))}
                     </div>
+                  </div>
+                ) : isError ? (
+                  <div className="px-5 py-8 text-center">
+                    <AlertCircle className="h-8 w-8 mx-auto text-destructive/50 mb-3" />
+                    <p className="font-body text-sm text-muted-foreground">
+                      Search failed. Please try again.
+                    </p>
                   </div>
                 ) : isLoading ? (
                   <div className="px-5 py-8 text-center">
@@ -164,10 +176,9 @@ const GlobalSearch = ({ open, onClose }: GlobalSearchProps) => {
                 )}
               </div>
 
-              {/* Footer hint */}
               <div className="px-5 py-2.5 border-t border-border bg-secondary/20">
                 <p className="font-body text-[10px] text-muted-foreground/60 text-center">
-                  Press <kbd className="px-1 py-0.5 rounded bg-secondary text-muted-foreground text-[10px]">ESC</kbd> to close · Navigate with arrow keys
+                  Press <kbd className="px-1 py-0.5 rounded bg-secondary text-muted-foreground text-[10px]">ESC</kbd> to close · Select an item to navigate to its map
                 </p>
               </div>
             </div>

@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { X, ChevronDown, ChevronUp, ExternalLink, BarChart3, BookOpen, Link2 } from "lucide-react";
+import { X, ChevronDown, ChevronUp, ExternalLink, BarChart3, BookOpen, Link2, Globe } from "lucide-react";
 import type { MapPOI } from "./FullPageMap";
+import { useWikipediaSnapshot } from "@/hooks/use-wikipedia";
 
 interface DetailPanelProps {
   item: MapPOI;
@@ -11,6 +12,8 @@ interface DetailPanelProps {
 
 const DetailPanel = ({ item, accentColor, onClose }: DetailPanelProps) => {
   const [expandedDetails, setExpandedDetails] = useState(false);
+  const [showWiki, setShowWiki] = useState(false);
+  const { data: wiki, isLoading: wikiLoading } = useWikipediaSnapshot(item.name);
 
   return (
     <motion.div
@@ -128,6 +131,50 @@ const DetailPanel = ({ item, accentColor, onClose }: DetailPanelProps) => {
                 </span>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Wikipedia Enrichment */}
+        {(wiki || wikiLoading) && (
+          <div className="mb-4 border-t border-border pt-3">
+            <button
+              onClick={() => setShowWiki(!showWiki)}
+              className="flex items-center gap-1.5 w-full text-left mb-2"
+            >
+              <Globe className="h-3.5 w-3.5 text-primary" />
+              <span className="font-body text-xs font-semibold text-foreground uppercase tracking-wider">Wikipedia</span>
+              {showWiki ? (
+                <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" />
+              ) : (
+                <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+              )}
+            </button>
+            <motion.div
+              initial={false}
+              animate={{ height: showWiki ? "auto" : 0, opacity: showWiki ? 1 : 0 }}
+              className="overflow-hidden"
+            >
+              {wikiLoading ? (
+                <div className="flex items-center gap-2 py-2">
+                  <div className="h-3 w-3 border border-primary border-t-transparent rounded-full animate-spin" />
+                  <span className="font-body text-xs text-muted-foreground">Loading snapshot…</span>
+                </div>
+              ) : wiki ? (
+                <div>
+                  <p className="font-body text-xs text-muted-foreground leading-relaxed mb-2">
+                    {wiki.summary}
+                  </p>
+                  <a
+                    href={wiki.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-body text-[11px] text-primary hover:underline inline-flex items-center gap-1"
+                  >
+                    Read on Wikipedia <ExternalLink className="h-2.5 w-2.5" />
+                  </a>
+                </div>
+              ) : null}
+            </motion.div>
           </div>
         )}
 
