@@ -16,8 +16,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useStudyBoard, type StudyBoardItem } from "@/stores/study-board";
 import NotesSection from "@/components/NotesSection";
-
-const COMPARE_KEY = "terranova_compare";
+import { loadCompare, saveCompare, clearCompare } from "@/stores/compare";
 
 const domainColors: Record<string, string> = {
   history: "hsl(38, 90%, 55%)",
