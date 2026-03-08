@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import DomainsSection from "@/components/DomainsSection";
+import WorldMap from "@/components/WorldMap";
 import FeaturedSection from "@/components/FeaturedSection";
 import Footer from "@/components/Footer";
 
@@ -10,6 +11,7 @@ const Index = () => {
       <Navbar />
       <HeroSection />
       <DomainsSection />
+      <WorldMap />
       <FeaturedSection />
       <Footer />
     </div>
