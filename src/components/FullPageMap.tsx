@@ -398,6 +398,8 @@ const FullPageMap = ({
 
             {filteredPOIs.map((poi) => {
               const color = getMarkerColor(poi.category);
+              const isDimmed = focusMode && selectedCategoryForFocus && poi.category !== selectedCategoryForFocus;
+              const markerOpacity = isDimmed ? 0.2 : 1;
               return (
                 <Marker
                   key={poi.name}
@@ -406,7 +408,7 @@ const FullPageMap = ({
                   onMouseEnter={() => setHoveredPOI(poi)}
                   onMouseLeave={() => setHoveredPOI(null)}
                 >
-                  <g style={{ cursor: "pointer" }} transform="translate(-10, -10)">
+                  <g style={{ cursor: "pointer", opacity: markerOpacity, transition: "opacity 0.3s" }} transform="translate(-10, -10)">
                     {/* Invisible larger hit area */}
                     <circle
                       r={16}
