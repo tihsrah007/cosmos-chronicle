@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,8 +11,9 @@ import GeologyMap from "./pages/GeologyMap";
 import HistoryMap from "./pages/HistoryMap";
 import CosmologyMap from "./pages/CosmologyMap";
 import ExplorePage from "./pages/ExplorePage";
-import UniverseMap from "./pages/UniverseMap";
 import NotFound from "./pages/NotFound";
+
+const UniverseMap = lazy(() => import("./pages/UniverseMap"));
 
 const queryClient = new QueryClient();
 
