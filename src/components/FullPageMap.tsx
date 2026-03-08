@@ -96,6 +96,7 @@ const FullPageMap = ({
   );
   const [showFilters, setShowFilters] = useState(false);
   const [showList, setShowList] = useState(false);
+  const [hoveredPOI, setHoveredPOI] = useState<MapPOI | null>(null);
 
   const filteredPOIs = pois.filter(
     (p) =>
