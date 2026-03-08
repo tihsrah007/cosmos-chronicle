@@ -2,10 +2,8 @@ import { useState, useMemo, useEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  ChevronLeft,
   BarChart3,
   BookOpen,
-  ExternalLink,
   ArrowLeftRight,
   ArrowRightLeft,
   MapPin,
@@ -18,8 +16,9 @@ import Footer from "@/components/Footer";
 import { useStudyBoard, type StudyBoardItem } from "@/stores/study-board";
 import NotesSection from "@/components/NotesSection";
 import AddToTrailButton from "@/components/AddToTrailButton";
+import SourceList from "@/components/SourceList";
 import { loadCompare, saveCompare, clearCompare } from "@/stores/compare";
-import { SourceConfidenceBadge, CopyCitationButton, inferSourceType } from "@/components/SourceBadge";
+import { BackButton, PageHeader, DomainBadge, EmptyState } from "@/components/ui/shared";
 
 const domainColors: Record<string, string> = {
   history: "hsl(38, 90%, 55%)",
@@ -49,9 +48,7 @@ const ComparePage = () => {
     };
   });
 
-  useEffect(() => {
-    saveCompare(selection);
-  }, [selection]);
+  useEffect(() => { saveCompare(selection); }, [selection]);
 
   const selectedA = useMemo(() => items.find((i) => i.id === selection.itemA) || null, [items, selection.itemA]);
   const selectedB = useMemo(() => items.find((i) => i.id === selection.itemB) || null, [items, selection.itemB]);
@@ -100,17 +97,8 @@ const ComparePage = () => {
     return (
       <div className="flex-1 rounded-xl border border-border bg-card p-5 min-w-0">
         <div className="flex items-start justify-between gap-2 mb-2">
-          <span
-            className="inline-block px-2.5 py-0.5 rounded-md text-[10px] font-body font-semibold"
-            style={{ backgroundColor: `${color}20`, color }}
-          >
-            {item.category}
-          </span>
-          <button
-            onClick={() => clearSide(side)}
-            className="p-1 rounded text-muted-foreground hover:text-foreground transition-colors print:hidden"
-            aria-label="Remove from compare"
-          >
+          <DomainBadge label={item.category} color={color} />
+          <button onClick={() => clearSide(side)} className="p-1 rounded text-muted-foreground hover:text-foreground transition-colors print:hidden" aria-label="Remove from compare">
             <X className="h-3.5 w-3.5" />
           </button>
         </div>
@@ -119,7 +107,6 @@ const ComparePage = () => {
         <p className="font-body text-[10px] text-muted-foreground capitalize mb-3">{item.domain}</p>
         <p className="font-body text-sm text-muted-foreground leading-relaxed mb-4">{item.description}</p>
 
-        {/* Key Figures */}
         {item.keyFigures && item.keyFigures.length > 0 && (
           <div className="mb-4">
             <div className="flex items-center gap-1.5 mb-2">
@@ -137,7 +124,6 @@ const ComparePage = () => {
           </div>
         )}
 
-        {/* Facts */}
         {item.facts && item.facts.length > 0 && (
           <div className="mb-4">
             <div className="flex items-center gap-1.5 mb-2">
@@ -161,37 +147,16 @@ const ComparePage = () => {
           </div>
         )}
 
-        {/* Sources with badges */}
         {item.sources && item.sources.length > 0 && (
-          <div className="border-t border-border pt-3 mb-4">
-            <span className="font-body text-[10px] text-muted-foreground/60 uppercase tracking-wider">Sources</span>
-            <div className="mt-1 space-y-1">
-              {item.sources.map((src, i) => {
-                const srcType = inferSourceType(src.label, src.url);
-                return (
-                  <div key={i} className="flex items-center gap-1.5">
-                    <SourceConfidenceBadge type={srcType} />
-                    {src.url ? (
-                      <a href={src.url} target="_blank" rel="noopener noreferrer" className="font-body text-[11px] text-primary hover:underline inline-flex items-center gap-1">
-                        {src.label} <ExternalLink className="h-2.5 w-2.5" />
-                      </a>
-                    ) : (
-                      <span className="font-body text-[11px] text-muted-foreground">{src.label}</span>
-                    )}
-                    <CopyCitationButton label={src.label} url={src.url} />
-                  </div>
-                );
-              })}
-            </div>
+          <div className="mb-4">
+            <SourceList sources={item.sources} />
           </div>
         )}
 
-        {/* Notes */}
         <div className="print:hidden">
           <NotesSection itemId={item.id} compact />
         </div>
 
-        {/* Open on Map */}
         {item.coordinates && (
           <button
             onClick={() => {
@@ -214,61 +179,30 @@ const ComparePage = () => {
       <main className="pt-24 pb-16">
         <div className="container max-w-5xl">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <button
-              onClick={() => navigate(-1)}
-              className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors font-body text-sm mb-6 print:hidden"
-            >
-              <ChevronLeft className="h-4 w-4" /> Back
-            </button>
+            <BackButton />
 
             <div className="flex items-center justify-between mb-8">
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 rounded-lg bg-primary/10">
-                    <ArrowLeftRight className="h-5 w-5 text-primary" />
-                  </div>
-                  <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground">Compare</h1>
-                </div>
-                <p className="font-body text-muted-foreground max-w-2xl">
-                  Select two items from your Study Board to compare them side by side.
-                </p>
-              </div>
+              <PageHeader
+                icon={ArrowLeftRight}
+                title="Compare"
+                description="Select two items from your Study Board to compare them side by side."
+              />
 
               {(selectedA || selectedB) && (
                 <div className="flex items-center gap-2 shrink-0 print:hidden">
                   {selectedA && selectedB && (
                     <>
-                      <AddToTrailButton
-                        step={{
-                          type: "compare",
-                          label: `${selectedA.name} vs ${selectedB.name}`,
-                          ref: `${selectedA.id}|${selectedB.id}`,
-                        }}
-                      />
-                      <button
-                        onClick={handlePrint}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary border border-border font-body text-xs text-muted-foreground hover:text-foreground transition-colors"
-                        aria-label="Print study sheet"
-                      >
+                      <AddToTrailButton step={{ type: "compare", label: `${selectedA.name} vs ${selectedB.name}`, ref: `${selectedA.id}|${selectedB.id}` }} />
+                      <button onClick={handlePrint} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary border border-border font-body text-xs text-muted-foreground hover:text-foreground transition-colors" aria-label="Print study sheet">
                         <Printer className="h-3.5 w-3.5" /> Print
                       </button>
-                      <button
-                        onClick={handleSwap}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary border border-border font-body text-xs text-muted-foreground hover:text-foreground transition-colors"
-                        aria-label="Swap sides"
-                      >
-                        <ArrowRightLeft className="h-3.5 w-3.5" />
-                        <span className="hidden sm:inline">Swap</span>
+                      <button onClick={handleSwap} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary border border-border font-body text-xs text-muted-foreground hover:text-foreground transition-colors" aria-label="Swap sides">
+                        <ArrowRightLeft className="h-3.5 w-3.5" /><span className="hidden sm:inline">Swap</span>
                       </button>
                     </>
                   )}
-                  <button
-                    onClick={handleClear}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary border border-border font-body text-xs text-muted-foreground hover:text-destructive transition-colors"
-                    aria-label="Clear compare"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">Clear</span>
+                  <button onClick={handleClear} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary border border-border font-body text-xs text-muted-foreground hover:text-destructive transition-colors" aria-label="Clear compare">
+                    <Trash2 className="h-3.5 w-3.5" /><span className="hidden sm:inline">Clear</span>
                   </button>
                 </div>
               )}
@@ -276,33 +210,22 @@ const ComparePage = () => {
           </motion.div>
 
           {items.length === 0 ? (
-            <div className="flex flex-col items-center py-16">
-              <p className="font-body text-sm text-muted-foreground mb-4">
-                Your Study Board is empty. Add items from any map to start comparing.
-              </p>
-              <button
-                onClick={() => navigate("/study-board")}
-                className="px-4 py-2 rounded-lg bg-primary text-primary-foreground font-body text-sm font-medium"
-              >
+            <EmptyState
+              icon={ArrowLeftRight}
+              title="Study Board is empty"
+              description="Add items from any map to start comparing."
+            >
+              <button onClick={() => navigate("/study-board")} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground font-body text-sm font-medium">
                 Go to Study Board
               </button>
-            </div>
+            </EmptyState>
           ) : (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="flex flex-col md:flex-row gap-4"
-            >
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="flex flex-col md:flex-row gap-4">
               {renderItemColumn(selectedA, "A")}
               <div className="hidden md:flex items-center justify-center print:hidden">
                 <div className="w-px h-full bg-border relative">
                   {selectedA && selectedB && (
-                    <button
-                      onClick={handleSwap}
-                      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-2 rounded-full bg-card border border-border text-muted-foreground hover:text-primary transition-colors shadow-lg"
-                      aria-label="Swap sides"
-                    >
+                    <button onClick={handleSwap} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-2 rounded-full bg-card border border-border text-muted-foreground hover:text-primary transition-colors shadow-lg" aria-label="Swap sides">
                       <ArrowRightLeft className="h-4 w-4" />
                     </button>
                   )}
