@@ -38,6 +38,7 @@ const GlobalSearch = ({ open, onClose }: GlobalSearchProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { data: results, isLoading, isError } = useGlobalSearch(query);
+  const studyBoard = useStudyBoard();
   const [activeIdx, setActiveIdx] = useState(-1);
   const listRef = useRef<HTMLDivElement>(null);
 
