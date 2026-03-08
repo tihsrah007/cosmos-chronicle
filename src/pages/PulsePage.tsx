@@ -75,7 +75,7 @@ const DOMAIN_COLORS: Record<PulseDomain, string> = {
 const PulsePage = () => {
   const navigate = useNavigate();
   const { data: updates, isLoading, isError } = usePulse();
-
+  const { addItem, hasItem } = useStudyBoard();
   const [activeDomain, setActiveDomain] = useState<PulseDomain | "all">("all");
   const [timeRange, setTimeRange] = useState<string>("30d");
   const [sourceFilter, setSourceFilter] = useState<PulseSourceType | "all">("all");
