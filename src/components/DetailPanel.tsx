@@ -1,9 +1,11 @@
 import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { X, ChevronDown, ChevronUp, ExternalLink, BarChart3, BookOpen, Link2, Globe, Plus, Check } from "lucide-react";
+import { X, ChevronDown, ChevronUp, ExternalLink, BarChart3, BookOpen, Link2, Globe, Plus, Check, ArrowLeftRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import type { MapPOI } from "./FullPageMap";
 import { useWikipediaSnapshot } from "@/hooks/use-wikipedia";
 import { useStudyBoard, makeStudyBoardId } from "@/stores/study-board";
+import NotesSection from "./NotesSection";
 
 interface DetailPanelProps {
   item: MapPOI;
@@ -14,10 +16,11 @@ interface DetailPanelProps {
 }
 
 const DetailPanel = ({ item, accentColor, domainSlug, onClose, onSelectRelated }: DetailPanelProps) => {
+  const navigate = useNavigate();
   const [expandedDetails, setExpandedDetails] = useState(false);
   const [showWiki, setShowWiki] = useState(false);
   const { data: wiki, isLoading: wikiLoading } = useWikipediaSnapshot(item.name);
-  const { addItem, hasItem } = useStudyBoard();
+  const { addItem, hasItem, items: boardItems } = useStudyBoard();
   const itemId = makeStudyBoardId(domainSlug, item.name);
   const isOnBoard = hasItem(itemId);
 
@@ -26,6 +29,24 @@ const DetailPanel = ({ item, accentColor, domainSlug, onClose, onSelectRelated }
       onSelectRelated(name);
     }
   }, [onSelectRelated]);
+
+  const handleCompare = () => {
+    // Ensure item is on board first
+    if (!isOnBoard) {
+      addItem({
+        name: item.name,
+        domain: domainSlug,
+        category: item.category,
+        description: item.description,
+        details: item.details,
+        facts: item.facts,
+        keyFigures: item.keyFigures,
+        sources: item.sources,
+        coordinates: item.coordinates,
+      });
+    }
+    navigate("/compare", { state: { itemA: itemId } });
+  };
 
   return (
     <motion.div
@@ -55,34 +76,42 @@ const DetailPanel = ({ item, accentColor, domainSlug, onClose, onSelectRelated }
         <h3 className="font-display text-xl font-bold text-foreground mb-2 pr-6">
           {item.name}
         </h3>
-        {/* Add to Study Board */}
-        <button
-          onClick={() => addItem({
-            name: item.name,
-            domain: domainSlug,
-            category: item.category,
-            description: item.description,
-            details: item.details,
-            facts: item.facts,
-            keyFigures: item.keyFigures,
-            sources: item.sources,
-            coordinates: item.coordinates,
-          })}
-          disabled={isOnBoard}
-          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md font-body text-[11px] font-medium transition-colors ${
-            isOnBoard
-              ? "bg-primary/10 text-primary cursor-default"
-              : "bg-secondary border border-border text-muted-foreground hover:text-foreground hover:border-primary/30"
-          }`}
-        >
-          {isOnBoard ? <><Check className="h-3 w-3" /> On Board</> : <><Plus className="h-3 w-3" /> Study Board</>}
-        </button>
+        {/* Actions row */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={() => addItem({
+              name: item.name,
+              domain: domainSlug,
+              category: item.category,
+              description: item.description,
+              details: item.details,
+              facts: item.facts,
+              keyFigures: item.keyFigures,
+              sources: item.sources,
+              coordinates: item.coordinates,
+            })}
+            disabled={isOnBoard}
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md font-body text-[11px] font-medium transition-colors ${
+              isOnBoard
+                ? "bg-primary/10 text-primary cursor-default"
+                : "bg-secondary border border-border text-muted-foreground hover:text-foreground hover:border-primary/30"
+            }`}
+          >
+            {isOnBoard ? <><Check className="h-3 w-3" /> On Board</> : <><Plus className="h-3 w-3" /> Study Board</>}
+          </button>
+          <button
+            onClick={handleCompare}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md font-body text-[11px] font-medium bg-secondary border border-border text-muted-foreground hover:text-foreground hover:border-primary/30 transition-colors"
+          >
+            <ArrowLeftRight className="h-3 w-3" /> Compare
+          </button>
+        </div>
       </div>
 
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto px-5 pb-5">
         {/* Summary */}
-        <p className="font-body text-sm text-muted-foreground leading-relaxed mb-4">
+        <p className="font-body text-sm text-muted-foreground leading-relaxed mb-4 mt-3">
           {item.description}
         </p>
 
@@ -168,6 +197,11 @@ const DetailPanel = ({ item, accentColor, domainSlug, onClose, onSelectRelated }
             </div>
           </div>
         )}
+
+        {/* Personal Notes */}
+        <div className="mb-4">
+          <NotesSection itemId={itemId} />
+        </div>
 
         {/* Wikipedia Enrichment */}
         {(wiki || wikiLoading) && (

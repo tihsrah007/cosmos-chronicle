@@ -11,6 +11,7 @@ const navItems = [
   { label: "Cosmology", href: "/cosmology" },
   { label: "Universe", href: "/universe" },
   { label: "Explore", href: "/explore" },
+  { label: "Topics", href: "/topics/plate-tectonics" },
   { label: "Study Board", href: "/study-board" },
   { label: "Pulse", href: "/pulse" },
 ];
