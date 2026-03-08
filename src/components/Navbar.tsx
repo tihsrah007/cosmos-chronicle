@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Compass, Menu, X, Search } from "lucide-react";
 import { Link } from "react-router-dom";
