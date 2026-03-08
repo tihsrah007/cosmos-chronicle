@@ -438,6 +438,7 @@ const HistoryMap = () => {
         <AnimatePresence>
           {selected && (
             <DetailPanel
+              domainSlug="history"
               item={{
                 name: selected.name,
                 coordinates: selected.coordinates,

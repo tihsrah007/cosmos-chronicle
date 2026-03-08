@@ -511,6 +511,7 @@ const FullPageMap = ({
             <DetailPanel
               item={selected}
               accentColor={getMarkerColor(selected.category)}
+              domainSlug={domainSlug}
               onClose={() => setSelected(null)}
               onSelectRelated={(name) => {
                 const match = pois.find(p => p.name === name);
