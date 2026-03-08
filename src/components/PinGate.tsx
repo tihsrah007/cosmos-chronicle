@@ -10,7 +10,7 @@ interface PinGateProps {
 const PIN_STORAGE_KEY = "terranova_pin_valid";
 
 const PinGate = ({ children }: PinGateProps) => {
-  const { data: config, isLoading: configLoading } = useAccessConfig();
+  const { data: config, isLoading: configLoading, isError } = useAccessConfig();
   const [pin, setPin] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
@@ -56,8 +56,8 @@ const PinGate = ({ children }: PinGateProps) => {
     );
   }
 
-  // No PIN required or already granted
-  if (!config?.pinRequired || granted) {
+  // No PIN required, already granted, or config fetch failed — let them through
+  if (!config?.pinRequired || granted || isError) {
     return <>{children}</>;
   }
 
