@@ -11,6 +11,7 @@ import GeologyMap from "./pages/GeologyMap";
 import HistoryMap from "./pages/HistoryMap";
 import CosmologyMap from "./pages/CosmologyMap";
 import ExplorePage from "./pages/ExplorePage";
+import StudyBoardPage from "./pages/StudyBoardPage";
 import NotFound from "./pages/NotFound";
 
 const UniverseMap = lazy(() => import("./pages/UniverseMap"));
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/history" element={<HistoryMap />} />
             <Route path="/cosmology" element={<CosmologyMap />} />
             <Route path="/explore" element={<ExplorePage />} />
+            <Route path="/study-board" element={<StudyBoardPage />} />
             <Route path="/universe" element={<Suspense fallback={<div className="fixed inset-0 bg-background flex items-center justify-center"><div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>}><UniverseMap /></Suspense>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

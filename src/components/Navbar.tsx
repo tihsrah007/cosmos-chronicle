@@ -11,6 +11,7 @@ const navItems = [
   { label: "Cosmology", href: "/cosmology" },
   { label: "Universe", href: "/universe" },
   { label: "Explore", href: "/explore" },
+  { label: "Study Board", href: "/study-board" },
 ];
 
 const Navbar = () => {

@@ -1,10 +1,11 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Globe, Mountain, Landmark, Telescope, MapPin, Filter, ArrowRight } from "lucide-react";
+import { Search, Globe, Mountain, Landmark, Telescope, MapPin, Filter, ArrowRight, Plus, Check } from "lucide-react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useDomainItems } from "@/hooks/use-domain-items";
+import { useStudyBoard, makeStudyBoardId } from "@/stores/study-board";
 
 const DOMAINS = [
   { slug: "history", label: "History", icon: Landmark, route: "/history", color: "hsl(38, 90%, 55%)" },
@@ -26,6 +27,7 @@ interface ExploreItem {
 }
 
 const ExplorePage = () => {
+  const studyBoard = useStudyBoard();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeDomains, setActiveDomains] = useState<Set<string>>(new Set(DOMAINS.map(d => d.slug)));
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
@@ -278,13 +280,38 @@ const ExplorePage = () => {
                       </>
                     )}
 
-                    {/* Link to map */}
-                    <Link
-                      to={item.route}
-                      className="inline-flex items-center gap-1 mt-3 font-body text-[11px] text-muted-foreground hover:text-primary transition-colors"
-                    >
-                      View on map <ArrowRight className="h-3 w-3" />
-                    </Link>
+                    {/* Actions */}
+                    <div className="flex items-center gap-3 mt-3">
+                      <Link
+                        to={item.route}
+                        className="inline-flex items-center gap-1 font-body text-[11px] text-muted-foreground hover:text-primary transition-colors"
+                      >
+                        View on map <ArrowRight className="h-3 w-3" />
+                      </Link>
+                      {(() => {
+                        const boardId = makeStudyBoardId(item.domain, item.name);
+                        const onBoard = studyBoard.hasItem(boardId);
+                        return (
+                          <button
+                            onClick={() => studyBoard.addItem({
+                              name: item.name,
+                              domain: item.domain,
+                              category: item.category,
+                              description: item.description,
+                              details: item.details,
+                              facts: item.facts,
+                              keyFigures: item.keyFigures,
+                            })}
+                            disabled={onBoard}
+                            className={`inline-flex items-center gap-1 font-body text-[11px] transition-colors ${
+                              onBoard ? "text-primary" : "text-muted-foreground hover:text-primary"
+                            }`}
+                          >
+                            {onBoard ? <><Check className="h-3 w-3" /> On Board</> : <><Plus className="h-3 w-3" /> Study Board</>}
+                          </button>
+                        );
+                      })()}
+                    </div>
                   </div>
                 </motion.div>
               ))}

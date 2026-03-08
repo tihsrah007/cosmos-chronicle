@@ -46,6 +46,7 @@ const GeologyMap = () => {
 
   return (
     <FullPageMap
+      domainSlug="geology"
       title="Geological Atlas"
       subtitle="Mountains, tectonic plates, volcanoes, oceans, trenches, islands, peninsulas, and more"
       pois={pois}

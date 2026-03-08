@@ -123,6 +123,7 @@ const CosmologyMap = () => {
 
   return (
     <FullPageMap
+      domainSlug="cosmology"
       title="Cosmological Atlas"
       subtitle="Observatories, discoveries, space missions, and the architecture of the universe"
       pois={pois}

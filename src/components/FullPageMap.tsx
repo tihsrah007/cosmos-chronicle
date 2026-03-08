@@ -48,6 +48,7 @@ interface TimelineConfig {
 interface FullPageMapProps {
   title: string;
   subtitle: string;
+  domainSlug: string;
   pois: MapPOI[];
   categories: readonly string[];
   markerColor: string;
@@ -91,6 +92,7 @@ const categoryColors: Record<string, string> = {
 const FullPageMap = ({
   title,
   subtitle,
+  domainSlug,
   pois,
   categories,
   markerColor,
@@ -509,6 +511,7 @@ const FullPageMap = ({
             <DetailPanel
               item={selected}
               accentColor={getMarkerColor(selected.category)}
+              domainSlug={domainSlug}
               onClose={() => setSelected(null)}
               onSelectRelated={(name) => {
                 const match = pois.find(p => p.name === name);
